@@ -36,3 +36,8 @@ export enum EOpenSource {
 	pressEnter = 'pressEnter',
 	inputClick = 'inputClick',
 }
+
+
+export type ReturnTypeOfFnThatReturnsPromise<T extends (...args: any[]) => Promise<any>> = T extends (...args: any[]) => Promise<infer R>
+	? R
+	: 'not a promise'

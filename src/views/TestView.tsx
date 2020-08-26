@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { SelectFiltered } from 'src/components'
+import { SelectAsync, SelectFiltered } from 'src/components'
 
 const noop = () => { }
 
@@ -22,7 +22,7 @@ const TestView = () => {
 	return (
 		<Div$>
 
-			{/* <SelectAsync /> */}
+			<SelectAsync />
 
 			<SelectFiltered
 				className='width-250'

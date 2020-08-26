@@ -1,8 +1,31 @@
-const fnPromise = (n: number) => new Promise(resolve => {
-	console.log('inside promise ')
-	return resolve(n)
-})
+import React, { useEffect } from 'react'
+import { useAsync } from 'src/hooks'
+import { fetchCities } from 'src/API'
 
-fnPromise(1).then(res => console.log(res))
+interface Props {
 
-export default {}
+}
+
+function SelectAsync({
+	...props
+}: Props) {
+
+	const [ { pending, error, data }, execute ] = useAsync(fetchCities)
+
+	useEffect(() => console.log(data), [ data ])
+
+	const handleClick = () => {
+		console.log('click')
+		execute('oi')
+	}
+
+	return (
+		<div>
+			<h1>Select Async is in the Game !</h1>
+			<br />
+			<button onClick={handleClick}> Call it ! </button>
+		</div>
+	)
+}
+
+export default SelectAsync
