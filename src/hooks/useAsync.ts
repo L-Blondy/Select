@@ -1,24 +1,24 @@
 import { useCallback, useRef } from 'react';
+import { FnReturningPromiseReturnType, FnReturningPromise } from 'src/types';
 import { useSetState, useMountedRef } from './'
 
 type State<T> = {
 	pending: boolean,
 	error: null | Error,
-	data: null | T
+	data: null | FnReturningPromiseReturnType<T>
 }
 
-type FnReturningPromise = (...args: any[]) => Promise<any>
 type Execute<T extends FnReturningPromise> = (...args: Parameters<T>) => void
 
 const useAsync = function <T extends FnReturningPromise>(
 	callback: T,
-): [ State<ReturnType<T>>, Execute<T> ] {
+): [ State<T>, Execute<T> ] {
 
 	const callbackRef = useRef(callback)
 	const lastCallID = useRef(0)
 	const isMountedRef = useMountedRef()
 
-	const [ state, setState ] = useSetState<State<ReturnType<T>>>({
+	const [ state, setState ] = useSetState<State<T>>({
 		pending: false,
 		error: null,
 		data: null
