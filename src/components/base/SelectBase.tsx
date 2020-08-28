@@ -101,8 +101,8 @@ function SelectBase<TOpt extends TOptBase>({
 			onInputChange(value)
 		},
 		toggleClick() {
-			input.current.click();
 			input.current.focus()
+			input.current.click()
 		},
 	}
 
@@ -130,7 +130,7 @@ function SelectBase<TOpt extends TOptBase>({
 					ref={input}
 					className='select__input'
 					placeholder={opt.label || placeholder}
-					value={filter ?? state.opt.value}
+					value={filter ?? (opt.value || state.opt.value)}
 					onChange={handle.inputChange}
 					onPressUp={handle.pressUp}
 					onPressDown={handle.pressDown}

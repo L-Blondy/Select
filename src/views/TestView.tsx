@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 // import { useDebounce } from 'src/hooks'
 
@@ -14,11 +14,14 @@ type Option = {
 const TestView = () => {
 	const [ option, setOption ] = useState<Option>({ value: '', label: '' })
 
+	useEffect(() => console.log(option), [ option ])
+
 	const options: Option[] = [
 		{ value: 'opt1', label: '_OPT1' },
 		{ value: 'opt2', label: '_OPT2' },
 		{ value: 'let1', label: '_LET1' },
 		{ value: 'let2', label: '_LET2' },
+		{ value: 'paris', label: '_PARIS' },
 	]
 
 	return (
@@ -27,6 +30,7 @@ const TestView = () => {
 			<SelectAsync
 				className='async-shit'
 				onInputChange={filter => console.log('TestView | onInputChange | ' + filter)}
+				onOpen={src => console.log(src)}
 				onChange={setOption}
 				value={option}
 			/>

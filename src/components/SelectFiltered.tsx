@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TOptBase, EOpenSource } from 'src/types'
 import SelectBase from './base/SelectBase'
 import { useSetState } from 'src/hooks'
@@ -31,6 +31,13 @@ function SelectFiltered<TOpt extends TOptBase>({
 		opt: opt
 	})
 
+	useEffect(() => {
+		if (opt.value === state.opt.value) return
+		if (!(defaultOptions || []).find(option => option.value === opt.value)) return
+		setState({ filter: opt.label, opt: opt })
+	}, [ defaultOptions, opt, setState, state.opt.value ])
+
+
 	const handleInputChange = (filter: string) => {
 		setState({ filter })
 		onInputChange(filter)
@@ -61,7 +68,7 @@ function SelectFiltered<TOpt extends TOptBase>({
 			onOpen={handleOpen}
 			onClose={handleClose}
 			filter={state.filter}
-			value={opt ?? state.opt}
+			value={state.opt}
 			{...props}
 		/>
 	)

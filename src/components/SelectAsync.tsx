@@ -26,11 +26,17 @@ function SelectAsync<TOpt extends TOptBase>({
 }: Props<TOpt>) {
 
 	const debouncedFetchCities = useDebounce(fetchCities, 1000)
-	const [ { pending, data }, execute ] = useAsync(debouncedFetchCities)
+	const [ { pending, data: options }, execute ] = useAsync(debouncedFetchCities)
 	const [ state, setState ] = useSetState({
 		filter: opt.label,
 		opt: opt
 	})
+
+	useEffect(() => {
+		if (opt.value === state.opt.value) return
+		setState({ filter: opt.label, opt: opt })
+	}, [ options, opt, setState, state.opt.value ])
+
 
 	const handleInputChange = (filter: string) => {
 		onInputChange(filter)
@@ -46,24 +52,30 @@ function SelectAsync<TOpt extends TOptBase>({
 		onChange(option)
 	}
 
-	console.log(opt)
+	const handleOpen = (openSource: EOpenSource) => {
+		if (openSource !== 'inputChange')
+			setState({ filter: '' })
+		onOpen(openSource)
+	}
+	const handleClose = () => {
+		setState({ filter: state.opt.label })
+		onClose()
+	};
+
 
 	return (
 		<div>
 			<h1>Select Async is in the Game !</h1>
 			<br />
 			<SelectBase
-				options={data as TOpt[] || []}
-				onInputChange={handleInputChange}
+				options={options as TOpt[] || []}
 				filter={state.filter}
 				isLoading={pending}
-				onChange={handleChange}
 				value={state.opt}
-				// onInputChange={handleInputChange}
-				// onOpen={handleOpen}
-				// onClose={handleClose}
-				// filter={state.filter}
-				// value={state.opt}
+				onInputChange={handleInputChange}
+				onChange={handleChange}
+				onOpen={handleOpen}
+				onClose={handleClose}
 				{...props}
 			/>
 		</div>
