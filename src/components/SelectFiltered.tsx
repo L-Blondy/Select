@@ -61,8 +61,7 @@ function SelectFiltered<TOpt extends TOptBase>({
 			onOpen={handleOpen}
 			onClose={handleClose}
 			filter={state.filter}
-			value={state.opt}
-			isLoading={true}
+			value={opt ?? state.opt}
 			{...props}
 		/>
 	)

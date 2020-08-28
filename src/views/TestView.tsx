@@ -27,6 +27,8 @@ const TestView = () => {
 			<SelectAsync
 				className='async-shit'
 				onInputChange={filter => console.log('TestView | onInputChange | ' + filter)}
+				onChange={opt => console.log(opt)}
+				value={option}
 			/>
 
 			<SelectFiltered
@@ -41,8 +43,8 @@ const TestView = () => {
 				onKeyDown={noop}
 				onOpen={noop}
 				onClose={noop}
-				onChange={setOption}
-				value={option}
+			// onChange={setOption}
+			// value={option}
 			/>
 
 		</Div$>

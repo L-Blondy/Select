@@ -24,7 +24,6 @@ const useAsync = function <T extends FnReturningPromise>(
 	})
 
 	const execute: Execute<T> = useCallback((...args) => {
-		console.log('executing async callback')
 		const callID = ++lastCallID.current
 		setState({ pending: true })
 
