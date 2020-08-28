@@ -13,7 +13,7 @@ type Props<TOpt> = {
 	className: string
 }
 
-function Menu<TOpt extends TOptBase>({
+const Menu = <TOpt extends TOptBase>({
 	options,
 	onMouseOver = noop,
 	onClick = noop,
@@ -21,29 +21,27 @@ function Menu<TOpt extends TOptBase>({
 	index,
 	noOptionsMessage,
 	className
-}: Props<TOpt>) {
+}: Props<TOpt>) => {
 
 	return (
-		<div className={className}>
-			<ul className={className + `__ul ${isOpen ? 'open' : 'close'}`}>
-				{options.length
-					? (
-						options.map((opt, i) => (
-							<li
-								onMouseDown={e => e.preventDefault()}
-								onMouseOver={() => onMouseOver(i)}
-								onClick={onClick}
-								className={i === index ? 'active-option' : ''}
-								key={opt.value + i}>
-								{opt.label}
-							</li>
-						))
-					) : (
-						<li className='no-option'>{noOptionsMessage}</li>
-					)
-				}
-			</ul>
-		</div>
+		<ul className={`${className} ${isOpen ? 'open' : 'close'}`}>
+			{options.length
+				? (
+					options.map((opt, i) => (
+						<li
+							onMouseDown={e => e.preventDefault()}
+							onMouseOver={() => onMouseOver(i)}
+							onClick={onClick}
+							className={`${className}__option ${i === index ? 'active-option' : ''}`}
+							key={opt.value + i}>
+							{opt.label}
+						</li>
+					))
+				) : (
+					<li className={`${className}__option no-option`}>{noOptionsMessage}</li>
+				)
+			}
+		</ul>
 	)
 }
 

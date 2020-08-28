@@ -4,6 +4,7 @@ type CityData = {
 }
 
 function fetchCities(keyword: string): Promise<{ value: string, label: string }[]> {
+	console.log('calling fetchCitites')
 	const url = 'https://api-cities.herokuapp.com/'
 
 	return fetch(`${url}?keyword=${keyword}`)

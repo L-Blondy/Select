@@ -1,13 +1,12 @@
 import { useCallback, useRef } from 'react';
-import { FnReturningPromiseReturnType, FnReturningPromise } from 'src/types';
 import { useSetState, useMountedRef } from './'
+import { FnReturningPromiseReturnType, FnReturningPromise } from 'src/types';
 
 type State<T> = {
 	pending: boolean,
 	error: null | Error,
 	data: null | FnReturningPromiseReturnType<T>
 }
-
 type Execute<T extends FnReturningPromise> = (...args: Parameters<T>) => void
 
 const useAsync = function <T extends FnReturningPromise>(
@@ -25,6 +24,7 @@ const useAsync = function <T extends FnReturningPromise>(
 	})
 
 	const execute: Execute<T> = useCallback((...args) => {
+		console.log('executing async callback')
 		const callID = ++lastCallID.current
 		setState({ pending: true })
 

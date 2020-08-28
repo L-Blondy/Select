@@ -37,6 +37,10 @@ export enum EOpenSource {
 	inputClick = 'inputClick',
 }
 
+export type AnyFunction =
+	| ((...args: any[]) => any)
+	| ((...args: any[]) => Promise<any>)
+
 export type FnReturningPromise = (...args: any[]) => Promise<any>
 export type PromiseReturnType<Prom> = Prom extends Promise<infer R> ? R : 'not a promise'
 export type FnReturningPromiseReturnType<T> = T extends FnReturningPromise ? PromiseReturnType<ReturnType<T>> : '<T> is not a function returning promise'
