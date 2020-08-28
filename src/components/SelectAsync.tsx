@@ -58,7 +58,7 @@ function SelectAsync<TOpt extends TOptBase>({
 				filter={state.filter}
 				isLoading={pending}
 				onChange={handleChange}
-				value={opt ?? state.opt}
+				value={state.opt}
 				// onInputChange={handleInputChange}
 				// onOpen={handleOpen}
 				// onClose={handleClose}
