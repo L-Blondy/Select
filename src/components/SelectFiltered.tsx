@@ -1,74 +1,44 @@
-import React, { useEffect } from 'react'
-import { TOptBase, EOpenSource } from 'src/types'
+import React, { useState } from 'react'
+import { OptBase, OpenSource } from 'src/types'
 import SelectBase from './base/SelectBase'
-import { useSetState } from 'src/hooks'
 
 const noop = () => { }
 
-interface Props<TOpt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
-	options: TOpt[]
-	value?: TOpt
+interface Props<Opt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
+	options: Opt[]
+	value?: Opt
 	noOptionsMessage?: string
 	onInputClick?: () => void
 	onInputChange?: (value: string) => void
-	onChange?: (value: TOpt) => void
-	onOpen?: (openSource: EOpenSource) => void
+	onChange?: (value: Opt) => void
+	onOpen?: (openSource: OpenSource) => void
 	onClose?: () => void
 }
 
-function SelectFiltered<TOpt extends TOptBase>({
+function SelectFiltered<Opt extends OptBase>({
 	options: defaultOptions,
-	onChange = noop,
 	onInputChange = noop,
-	onOpen = noop,
 	onClose = noop,
-	value: opt = { value: '', label: '' } as TOpt,
 	...props
-}: Props<TOpt>) {
+}: Props<Opt>) {
 
-	const [ state, setState ] = useSetState({
-		filter: opt.label,
-		opt: opt
-	})
-
-	useEffect(() => {
-		if (opt.value === state.opt.value) return
-		if (!(defaultOptions || []).find(option => option.value === opt.value)) return
-		setState({ filter: opt.label, opt: opt })
-	}, [ defaultOptions, opt, setState, state.opt.value ])
-
+	const [ options, setOptions ] = useState(defaultOptions)
 
 	const handleInputChange = (filter: string) => {
-		setState({ filter })
 		onInputChange(filter)
+		setOptions(defaultOptions.filter(opt => RegExp('^' + filter, 'i').test(opt.label)))
 	}
 
-	const handleChange = (option: TOpt) => {
-		setState({
-			filter: option.label,
-			opt: option
-		})
-		onChange(option)
-	}
-	const handleOpen = (openSource: EOpenSource) => {
-		if (openSource !== 'inputChange')
-			setState({ filter: '' })
-		onOpen(openSource)
-	}
 	const handleClose = () => {
-		setState({ filter: state.opt.label })
 		onClose()
-	};
+		setOptions(defaultOptions)
+	}
 
 	return (
 		<SelectBase
-			options={defaultOptions.filter(opt => RegExp('^' + state.filter, 'i').test(opt.label))}
-			onChange={handleChange}
+			options={options}
 			onInputChange={handleInputChange}
-			onOpen={handleOpen}
 			onClose={handleClose}
-			filter={state.filter}
-			value={state.opt}
 			{...props}
 		/>
 	)

@@ -1,26 +1,25 @@
 import styled, { StyledComponent } from 'styled-components'
 import React, { useReducer, useRef, useState, useLayoutEffect, useEffect } from 'react'
 import { reducer, Menu, Input, LoadingIndicator, ArrowButton } from './'
-import { TOptBase, TState, TActions, EOpenSource } from 'src/types'
+import { OptBase, State, Actions, OpenSource } from 'src/types'
 import { borderColor, borderColorHover, paddingLeft } from 'src/styles'
 import src_preloader from 'src/assets/preloader.svg'
 
 const noop = () => { }
 
-interface Props<TOpt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
-	options: TOpt[]
-	filter: string
-	value?: TOpt
+interface Props<Opt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
+	options: Opt[]
+	value?: Opt
 	noOptionsMessage?: string
 	onInputChange?: (value: string) => void
-	onChange?: (value: TOpt) => void
-	onOpen?: (openSource: EOpenSource) => void
+	onChange?: (value: Opt) => void
+	onOpen?: (openSource: OpenSource) => void
 	onClose?: () => void
 	onInputClick?: () => void
 	isLoading?: boolean
 }
 
-function SelectBase<TOpt extends TOptBase>({
+function SelectBase<Opt extends OptBase>({
 	onOpen = noop,
 	onClose = noop,
 	onFocus = noop,
@@ -36,18 +35,18 @@ function SelectBase<TOpt extends TOptBase>({
 	noOptionsMessage = 'No options',
 	options = [],
 	isLoading = false,
-	filter,
-	value: opt = { value: '', label: '' } as TOpt,
+	value: opt,
 	className = '',
 	...props
-}: Props<TOpt>) {
+}: Props<Opt>) {
 
 	const input = useRef<HTMLInputElement>(null!)
 	const shouldInputClickCallOnOpen = useRef(true)
-	const [ state, dispatch ] = useReducer<(state: TState<TOpt>, action: TActions<TOpt>) => TState<TOpt>>(reducer, {
+	const [ state, dispatch ] = useReducer<(state: State<Opt>, action: Actions<Opt> | Actions<Opt>[]) => State<Opt>>(reducer, {
 		index: 0,
 		isOpen: false,
-		opt: opt
+		filter: opt?.label || '',
+		opt: opt ?? { value: '', label: '' } as Opt
 	})
 
 	const currentOption = options[ state.index ]
@@ -61,8 +60,8 @@ function SelectBase<TOpt extends TOptBase>({
 		},
 		pressEnterOrMenuClick() {
 			if (!state.isOpen) {
-				dispatch({ type: 'open' })
-				onOpen(EOpenSource.pressEnter)
+				dispatch({ type: 'open', source: OpenSource.pressEnter })
+				onOpen(OpenSource.pressEnter)
 				return
 			}
 			dispatch({ type: 'select', opt: currentOption })
@@ -71,9 +70,9 @@ function SelectBase<TOpt extends TOptBase>({
 			options.length && onChange(currentOption)
 		},
 		focus(e: React.FocusEvent<HTMLInputElement>) {
-			dispatch({ type: 'open' })
+			dispatch({ type: 'open', source: OpenSource.focus })
 			onFocus(e)
-			onOpen(EOpenSource.focus)
+			onOpen(OpenSource.focus)
 			shouldInputClickCallOnOpen.current = false
 		},
 		blur(e: React.FocusEvent<HTMLInputElement>) {
@@ -84,23 +83,27 @@ function SelectBase<TOpt extends TOptBase>({
 			shouldInputClickCallOnOpen.current = true
 		},
 		inputClick() {
-			dispatch({ type: 'open' })
+			dispatch({ type: 'open', source: OpenSource.inputClick })
 			onInputClick()
 			if (shouldInputClickCallOnOpen.current && !state.isOpen)
-				onOpen(EOpenSource.inputClick)
+				onOpen(OpenSource.inputClick)
 		},
 		mouseOverMenu(index: number) {
-			dispatch({ type: 'goto_index', index })
+			dispatch({ type: 'set_index', index })
 		},
-		inputChange(value: string) {
+		inputChange(filter: string) {
 			if (!state.isOpen) {
-				dispatch({ type: 'open' })
-				onOpen(EOpenSource.inputChange)
+				dispatch({ type: 'open', source: OpenSource.inputChange })
+				onOpen(OpenSource.inputChange)
 			}
-			dispatch({ type: 'goto_index', index: 0 })
-			onInputChange(value)
+			dispatch([
+				{ type: 'set_index', index: 0 },
+				{ type: 'set_filter', filter }
+			])
+			onInputChange(filter)
 		},
-		toggleClick() {
+		toggleClick(e: React.MouseEvent<HTMLDivElement>) {
+			e.stopPropagation()
 			input.current.focus()
 			input.current.click()
 		},
@@ -129,8 +132,8 @@ function SelectBase<TOpt extends TOptBase>({
 				<Input
 					ref={input}
 					className='select__input'
-					placeholder={opt.label || placeholder}
-					value={filter ?? (opt.value || state.opt.value)}
+					placeholder={(opt?.label ?? state.opt.label) || placeholder}
+					value={state.isOpen ? state.filter : (opt?.label ?? state.opt.label)}
 					onChange={handle.inputChange}
 					onPressUp={handle.pressUp}
 					onPressDown={handle.pressDown}

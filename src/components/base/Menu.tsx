@@ -1,5 +1,5 @@
 import React from 'react'
-import { TOptBase } from 'src/types'
+import { OptBase } from 'src/types'
 
 const noop = () => { }
 
@@ -13,7 +13,7 @@ type Props<TOpt> = {
 	className: string
 }
 
-const Menu = <TOpt extends TOptBase>({
+const Menu = <TOpt extends OptBase>({
 	options,
 	onMouseOver = noop,
 	onClick = noop,

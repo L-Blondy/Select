@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-// import { useDebounce } from 'src/hooks'
-
 import { SelectAsync, SelectFiltered } from 'src/components'
 
 const noop = () => { }
@@ -12,9 +10,11 @@ type Option = {
 }
 
 const TestView = () => {
-	const [ option, setOption ] = useState<Option>({ value: '', label: '' })
+	const [ sf, setSf ] = useState<Option>({ value: '', label: '' })
+	const [ sa, setSa ] = useState<Option>({ value: '', label: '' })
 
-	useEffect(() => console.log(option), [ option ])
+	useEffect(() => console.log(sa), [ sa ])
+
 
 	const options: Option[] = [
 		{ value: 'opt1', label: '_OPT1' },
@@ -31,14 +31,14 @@ const TestView = () => {
 				className='async-shit'
 				onInputChange={filter => console.log('TestView | onInputChange | ' + filter)}
 				onOpen={src => console.log(src)}
-				onChange={setOption}
-				value={option}
+				onChange={setSa}
+				value={sa}
 			/>
 
 			<SelectFiltered
 				className='width-250'
 				options={options}
-				onFocus={noop}
+				onFocus={(noop)}
 				onBlur={noop}
 				onClick={noop}
 				onTouchStart={noop}
@@ -47,8 +47,8 @@ const TestView = () => {
 				onKeyDown={noop}
 				onOpen={noop}
 				onClose={noop}
-				onChange={setOption}
-				value={option}
+				onChange={setSf}
+				value={sf}
 			/>
 
 		</Div$>

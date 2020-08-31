@@ -8,7 +8,7 @@ function useDebouncedEffect(
 	delay: number = 300,
 ) {
 
-	const debouncedCallback = useDebounce(callback, delay)
+	const [ debouncedCallback ] = useDebounce(callback, delay)
 
 	useEffect(() => {
 		debouncedCallback()

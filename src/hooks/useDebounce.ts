@@ -6,20 +6,13 @@ type DebouncedFn<T extends AnyFunction> = (...args: Parameters<T>) => Promise<Fn
 const useDebounce = <T extends AnyFunction>(
 	callback: T,
 	delay: number = 300
-): T | DebouncedFn<T> => {
+): [ (T | DebouncedFn<T>), () => void ] => {
 
 	const callbackRef = useRef(callback)
 	const delayRef = useRef(delay)
 	const token = useRef<number | null>(null)
 
-	useEffect(() => {
-		callbackRef.current = callback
-		delayRef.current = delay
-	}, [ callback, delay ])
-
-	useEffect(() => () => {
-		token.current && clearTimeout(token.current)
-	}, [])
+	const cancel = () => { token.current && clearTimeout(token.current) }
 
 	const debouncedCallback: DebouncedFn<T> = useCallback((...args) => {
 		args.forEach((arg: any) => arg.target && arg.persist?.())
@@ -32,7 +25,16 @@ const useDebounce = <T extends AnyFunction>(
 		})
 	}, [])
 
-	return delay ? debouncedCallback : callback
+	useEffect(() => {
+		callbackRef.current = callback
+		delayRef.current = delay
+	}, [ callback, delay ])
+
+	useEffect(() => () => {
+		cancel()
+	}, [])
+
+	return [ (delay ? debouncedCallback : callback), cancel ]
 }
 
 export default useDebounce

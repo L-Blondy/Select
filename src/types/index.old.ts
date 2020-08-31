@@ -1,15 +1,14 @@
-export type OptBase = { value: string, label: string }
+export type TOptBase = { value: string, label: string }
 
-export type State<TOpt> = {
+export type TState<TOpt> = {
 	index: number
 	isOpen: boolean,
-	filter: string,
 	opt: TOpt
 }
 
-export type Actions<TOpt> =
+export type TActions<TOpt> =
 	| {
-		type: 'set_index',
+		type: 'goto_index',
 		index: number
 	}
 	| {
@@ -21,8 +20,7 @@ export type Actions<TOpt> =
 		options: TOpt[]
 	}
 	| {
-		type: 'open',
-		source: OpenSource
+		type: 'open'
 	}
 	| {
 		type: 'close'
@@ -31,12 +29,8 @@ export type Actions<TOpt> =
 		type: 'select',
 		opt: TOpt
 	}
-	| {
-		type: 'set_filter',
-		filter: string
-	}
 
-export enum OpenSource {
+export enum EOpenSource {
 	inputChange = 'inputChange',
 	focus = 'focus',
 	pressEnter = 'pressEnter',

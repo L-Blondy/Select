@@ -1,81 +1,56 @@
 import React, { useEffect, useState } from 'react'
 import { useAsync, useSetState, useDebouncedEffect, useDebounce } from 'src/hooks'
 import { SelectBase } from './base'
+import useCommonHandlers from './useCommonHandlers'
 import { fetchCities } from 'src/API'
-import { TOptBase, EOpenSource } from 'src/types'
+import { OptBase, OpenSource } from 'src/types'
 
 const noop = () => { }
 
-interface Props<TOpt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
-	value?: TOpt
+interface Props<Opt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
+	value?: Opt
 	noOptionsMessage?: string
 	onInputClick?: () => void
 	onInputChange?: (value: string) => void
-	onChange?: (value: TOpt) => void
-	onOpen?: (openSource: EOpenSource) => void
+	onChange?: (value: Opt) => void
+	onOpen?: (openSource: OpenSource) => void
 	onClose?: () => void
 }
 
-function SelectAsync<TOpt extends TOptBase>({
+function SelectAsync<Opt extends OptBase>({
 	onChange = noop,
 	onInputChange = noop,
-	onOpen = noop,
-	onClose = noop,
-	value: opt = { value: '', label: '' } as TOpt,
+	value: opt = { value: '', label: '' } as Opt,
 	...props
-}: Props<TOpt>) {
+}: Props<Opt>) {
 
-	const debouncedFetchCities = useDebounce(fetchCities, 1000)
-	const [ { pending, data: options }, execute ] = useAsync(debouncedFetchCities)
-	const [ state, setState ] = useSetState({
-		filter: opt.label,
-		opt: opt
-	})
+	const [ debouncedCallback, cancel ] = useDebounce(fetchCities, 1000)
+	const [ { pending, data: options }, execute, setState ] = useAsync(debouncedCallback)
 
-	useEffect(() => {
-		if (opt.value === state.opt.value) return
-		setState({ filter: opt.label, opt: opt })
-	}, [ options, opt, setState, state.opt.value ])
-
-
-	const handleInputChange = (filter: string) => {
-		onInputChange(filter)
-		setState({ filter })
-		execute(filter)
-	}
-
-	const handleChange = (option: TOpt) => {
+	const handleInputChange = (keyword: string) => {
+		if (keyword) return execute(keyword)
+		cancel()
 		setState({
-			filter: option.label,
-			opt: option
+			data: [],
+			pending: false,
+			error: null
 		})
-		onChange(option)
 	}
 
-	const handleOpen = (openSource: EOpenSource) => {
-		if (openSource !== 'inputChange')
-			setState({ filter: '' })
-		onOpen(openSource)
-	}
-	const handleClose = () => {
-		setState({ filter: state.opt.label })
-		onClose()
-	};
 
+	const handleChange = () => {
+		setState({ data: [] })
+	}
 
 	return (
 		<div>
 			<h1>Select Async is in the Game !</h1>
 			<br />
 			<SelectBase
-				options={options as TOpt[] || []}
-				filter={state.filter}
+				options={options as Opt[] || []}
 				isLoading={pending}
-				value={state.opt}
-				onInputChange={handleInputChange}
 				onChange={handleChange}
-				onOpen={handleOpen}
-				onClose={handleClose}
+				onInputChange={handleInputChange}
 				{...props}
 			/>
 		</div>

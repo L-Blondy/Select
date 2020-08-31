@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react'
 
 type PatchType<T> = Partial<T> | ((prevState: T) => (Partial<T>))
+export type SetState<T> = (patch: Partial<T> | ((prevState: T) => Partial<T>)) => void
 
 const useSetState = <T extends object>(
 	initialState: T = {} as T
-): [ T, (patch: Partial<T> | ((prevState: T) => Partial<T>)) => void ] => {
+): [ T, SetState<T> ] => {
 	const [ state, set ] = useState<T>(initialState);
 	const setState = useCallback((patch: PatchType<T>) => {
 		set(prevState => ({
@@ -15,8 +16,5 @@ const useSetState = <T extends object>(
 
 	return [ state, setState ];
 };
-
-
-
 
 export default useSetState
