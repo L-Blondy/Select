@@ -11,12 +11,15 @@ type Option = {
 
 const TestView = () => {
 	const [ sf, setSf ] = useState<Option>({ value: '', label: '' })
-	const [ sa, setSa ] = useState<Option>({ value: '', label: '' })
-
-	useEffect(() => console.log(sa), [ sa ])
-
+	const [ cleanup, setCleanup ] = useState<Option>({ value: '', label: '' })
+	const [ noCleanup, setNoCleanup ] = useState<Option>({ value: '', label: '' })
 
 	const options: Option[] = [
+		{ value: 'opt1', label: '_OPT1' },
+		{ value: 'opt2', label: '_OPT2' },
+		{ value: 'let1', label: '_LET1' },
+		{ value: 'let2', label: '_LET2' },
+		{ value: 'paris', label: '_PARIS' },
 		{ value: 'opt1', label: '_OPT1' },
 		{ value: 'opt2', label: '_OPT2' },
 		{ value: 'let1', label: '_LET1' },
@@ -27,16 +30,24 @@ const TestView = () => {
 	return (
 		<Div$>
 
+			<h1>Async With cleanup</h1>
 			<SelectAsync
 				className='async-shit'
-				onInputChange={filter => console.log('TestView | onInputChange | ' + filter)}
-				onOpen={src => console.log(src)}
-				onChange={setSa}
-				value={sa}
+				onChange={setCleanup}
+				value={cleanup}
 			/>
 
+			<h1>Async Without cleanup</h1>
+			<SelectAsync
+				className='async-shit'
+				onChange={setNoCleanup}
+				value={noCleanup}
+				withCleanup={false}
+			/>
+
+			<h1>Filtered</h1>
 			<SelectFiltered
-				className='width-250'
+				className='filtered'
 				options={options}
 				onFocus={(noop)}
 				onBlur={noop}
@@ -65,17 +76,18 @@ const Div$ = styled.div`
 	justify-content: space-evenly;
 	padding: 10rem;
 
-	.width-250 {
-		width: 250px;
-		width: 250px;
+	.select {
+		width: 300px;
 		margin-bottom: 3rem;
 		font-size: 1.15rem;
 		line-height: 2em;
-		color: #444;
+		color: #f0f0f0;
+		background: steelblue;
+		
+
+		.select__content-wrapper {
+			/* border-color: pink; */
+		}
 	}
 
-	.async-shit {
-		line-height: 2em;
-		font-size: 1.3rem;
-	}
 `

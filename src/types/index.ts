@@ -6,6 +6,18 @@ export type State<TOpt> = {
 	filter: string,
 	opt: TOpt
 }
+export type BaseProps<Opt> = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> & {
+	options: Opt[]
+	value?: Opt
+	noOptionsMessage?: string
+	onInputClick?: () => void
+	onInputChange?: (value: string) => void
+	onChange?: (value: Opt) => void
+	onOpen?: (openSource: OpenSource) => void
+	onClose?: () => void
+	isLoading?: boolean
+	withCleanup?: boolean
+}
 
 export type Actions<TOpt> =
 	| {
@@ -22,10 +34,12 @@ export type Actions<TOpt> =
 	}
 	| {
 		type: 'open',
-		source: OpenSource
+		source: OpenSource,
+		clear: boolean
 	}
 	| {
-		type: 'close'
+		type: 'close',
+		clear: boolean
 	}
 	| {
 		type: 'select',

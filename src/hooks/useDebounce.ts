@@ -34,7 +34,7 @@ const useDebounce = <T extends AnyFunction>(
 		cancel()
 	}, [])
 
-	return [ (delay ? debouncedCallback : callback), cancel ]
+	return [ debouncedCallback, cancel ]
 }
 
 export default useDebounce

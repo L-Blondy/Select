@@ -1,19 +1,10 @@
 import React, { useState } from 'react'
-import { OptBase, OpenSource } from 'src/types'
+import { BaseProps, OptBase } from 'src/types'
 import SelectBase from './base/SelectBase'
 
 const noop = () => { }
 
-interface Props<Opt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
-	options: Opt[]
-	value?: Opt
-	noOptionsMessage?: string
-	onInputClick?: () => void
-	onInputChange?: (value: string) => void
-	onChange?: (value: Opt) => void
-	onOpen?: (openSource: OpenSource) => void
-	onClose?: () => void
-}
+interface Props<Opt> extends Omit<BaseProps<Opt>, 'isLoading' | 'withCleanup'> { }
 
 function SelectFiltered<Opt extends OptBase>({
 	options: defaultOptions,

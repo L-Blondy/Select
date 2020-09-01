@@ -37,7 +37,7 @@ function reducer<Opt extends OptBase>(state: State<Opt>, actions: Actions<Opt> |
 				draw = {
 					...draw,
 					isOpen: false,
-					filter: draw.opt.label
+					filter: action.clear ? draw.opt.label : draw.filter
 				}
 				break
 			case 'open':
@@ -45,7 +45,7 @@ function reducer<Opt extends OptBase>(state: State<Opt>, actions: Actions<Opt> |
 					...draw,
 					isOpen: true,
 					index: 0,
-					filter: action.source === 'inputChange' ? draw.filter : ''
+					filter: action.source === 'inputChange' || !action.clear ? draw.filter : ''
 				}
 				break
 			case 'select':

@@ -1,23 +1,11 @@
 import styled, { StyledComponent } from 'styled-components'
 import React, { useReducer, useRef, useState, useLayoutEffect, useEffect } from 'react'
 import { reducer, Menu, Input, LoadingIndicator, ArrowButton } from './'
-import { OptBase, State, Actions, OpenSource } from 'src/types'
+import { BaseProps, OptBase, State, Actions, OpenSource } from 'src/types'
 import { borderColor, borderColorHover, paddingLeft } from 'src/styles'
 import src_preloader from 'src/assets/preloader.svg'
 
 const noop = () => { }
-
-interface Props<Opt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
-	options: Opt[]
-	value?: Opt
-	noOptionsMessage?: string
-	onInputChange?: (value: string) => void
-	onChange?: (value: Opt) => void
-	onOpen?: (openSource: OpenSource) => void
-	onClose?: () => void
-	onInputClick?: () => void
-	isLoading?: boolean
-}
 
 function SelectBase<Opt extends OptBase>({
 	onOpen = noop,
@@ -37,8 +25,9 @@ function SelectBase<Opt extends OptBase>({
 	isLoading = false,
 	value: opt,
 	className = '',
+	withCleanup = true,
 	...props
-}: Props<Opt>) {
+}: BaseProps<Opt>) {
 
 	const input = useRef<HTMLInputElement>(null!)
 	const shouldInputClickCallOnOpen = useRef(true)
@@ -50,6 +39,12 @@ function SelectBase<Opt extends OptBase>({
 	})
 
 	const currentOption = options[ state.index ]
+	const getInputValue = () => {
+		if (state.isOpen || !withCleanup) {
+			return state.filter
+		}
+		return opt?.label ?? state.opt.label
+	}
 
 	const handle = {
 		pressUp() {
@@ -60,30 +55,30 @@ function SelectBase<Opt extends OptBase>({
 		},
 		pressEnterOrMenuClick() {
 			if (!state.isOpen) {
-				dispatch({ type: 'open', source: OpenSource.pressEnter })
+				dispatch({ type: 'open', source: OpenSource.pressEnter, clear: withCleanup })
 				onOpen(OpenSource.pressEnter)
 				return
 			}
-			dispatch({ type: 'select', opt: currentOption })
+			currentOption && dispatch({ type: 'select', opt: currentOption })
 			onClose()
 			shouldInputClickCallOnOpen.current = true
 			options.length && onChange(currentOption)
 		},
 		focus(e: React.FocusEvent<HTMLInputElement>) {
-			dispatch({ type: 'open', source: OpenSource.focus })
+			dispatch({ type: 'open', source: OpenSource.focus, clear: withCleanup })
 			onFocus(e)
 			onOpen(OpenSource.focus)
 			shouldInputClickCallOnOpen.current = false
 		},
 		blur(e: React.FocusEvent<HTMLInputElement>) {
-			dispatch({ type: 'close' })
+			dispatch({ type: 'close', clear: withCleanup })
 			onBlur(e)
 			if (!state.isOpen) return
 			onClose()
 			shouldInputClickCallOnOpen.current = true
 		},
 		inputClick() {
-			dispatch({ type: 'open', source: OpenSource.inputClick })
+			dispatch({ type: 'open', source: OpenSource.inputClick, clear: withCleanup })
 			onInputClick()
 			if (shouldInputClickCallOnOpen.current && !state.isOpen)
 				onOpen(OpenSource.inputClick)
@@ -93,7 +88,7 @@ function SelectBase<Opt extends OptBase>({
 		},
 		inputChange(filter: string) {
 			if (!state.isOpen) {
-				dispatch({ type: 'open', source: OpenSource.inputChange })
+				dispatch({ type: 'open', source: OpenSource.inputChange, clear: withCleanup })
 				onOpen(OpenSource.inputChange)
 			}
 			dispatch([
@@ -133,7 +128,7 @@ function SelectBase<Opt extends OptBase>({
 					ref={input}
 					className='select__input'
 					placeholder={(opt?.label ?? state.opt.label) || placeholder}
-					value={state.isOpen ? state.filter : (opt?.label ?? state.opt.label)}
+					value={getInputValue()}
 					onChange={handle.inputChange}
 					onPressUp={handle.pressUp}
 					onPressDown={handle.pressDown}
@@ -219,6 +214,11 @@ const Div$: StyledComponent<'div', any, Props$> = styled.div`
 		&:focus {
 			outline: none;
 		}
+
+		&::placeholder {
+			color: currentColor;
+			opacity: 0.66;
+		}
 	}
 	/** Input end */
 	/** Menu start */
@@ -245,7 +245,8 @@ const Div$: StyledComponent<'div', any, Props$> = styled.div`
 		background: lightblue
 	}
 	.no-option {
-		opacity: 0.66
+		opacity: 0.66;
+		text-align: center;
 	}
 
 	.open {

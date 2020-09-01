@@ -1,59 +1,63 @@
-import React, { useEffect, useState } from 'react'
-import { useAsync, useSetState, useDebouncedEffect, useDebounce } from 'src/hooks'
+import React, { useRef, useEffect } from 'react'
+import { useAsync, useDebounce } from 'src/hooks'
 import { SelectBase } from './base'
-import useCommonHandlers from './useCommonHandlers'
 import { fetchCities } from 'src/API'
-import { OptBase, OpenSource } from 'src/types'
+import { BaseProps, OptBase, OpenSource } from 'src/types'
 
 const noop = () => { }
 
-interface Props<Opt> extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> {
-	value?: Opt
-	noOptionsMessage?: string
-	onInputClick?: () => void
-	onInputChange?: (value: string) => void
-	onChange?: (value: Opt) => void
-	onOpen?: (openSource: OpenSource) => void
-	onClose?: () => void
-}
+interface Props<Opt> extends Omit<BaseProps<Opt>, 'isLoading' | 'options'> { }
 
 function SelectAsync<Opt extends OptBase>({
-	onChange = noop,
 	onInputChange = noop,
+	onOpen = noop,
+	onClose = noop,
+	withCleanup = true,
 	value: opt = { value: '', label: '' } as Opt,
 	...props
 }: Props<Opt>) {
 
 	const [ debouncedCallback, cancel ] = useDebounce(fetchCities, 1000)
-	const [ { pending, data: options }, execute, setState ] = useAsync(debouncedCallback)
+	const [ { isPending, data: options }, execute, setState ] = useAsync(debouncedCallback, 'fetchCities')
+	const lastKeyword = useRef(opt.value)
 
-	const handleInputChange = (keyword: string) => {
-		if (keyword) return execute(keyword)
+	const reset = () => {
 		cancel()
 		setState({
 			data: [],
-			pending: false,
-			error: null
+			isPending: false,
+			status: 'idle',
 		})
 	}
 
+	const handleInputChange = (keyword: string) => {
+		lastKeyword.current = keyword
+		if (keyword)
+			return execute(keyword)
+		reset()
+	}
 
-	const handleChange = () => {
-		setState({ data: [] })
+	const handleClose = () => {
+		onClose()
+		reset()
+	}
+
+	const handleOpen = (openSource: OpenSource) => {
+		onOpen(openSource)
+		if (withCleanup || !lastKeyword.current) return
+		execute(lastKeyword.current)
 	}
 
 	return (
-		<div>
-			<h1>Select Async is in the Game !</h1>
-			<br />
-			<SelectBase
-				options={options as Opt[] || []}
-				isLoading={pending}
-				onChange={handleChange}
-				onInputChange={handleInputChange}
-				{...props}
-			/>
-		</div>
+		<SelectBase
+			options={options as Opt[] || []}
+			isLoading={isPending}
+			onClose={handleClose}
+			onInputChange={handleInputChange}
+			onOpen={handleOpen}
+			withCleanup={withCleanup}
+			{...props}
+		/>
 	)
 }
 
