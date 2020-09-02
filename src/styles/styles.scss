@@ -1,0 +1,168 @@
+$borderColor: #999;
+$borderColorHover: #666;
+$borderColorFocus: #00adff;
+$activeOptionBg: #dff2fb;
+$paddingLeft: 0.4em;
+
+.select {
+   position: relative;
+   background: white;
+   border-radius: 100px;
+   line-height: 1.7em;
+   width: 200px;
+   display: flex;
+
+   * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+   }
+
+   /** wrapper start */
+   &__content {
+      position: relative;
+      display: flex;
+      background: inherit;
+      overflow: hidden;
+      width: 100%;
+   }
+
+   .focus {
+      border-color: #2d9dff;
+   }
+
+   /** wrapper end */
+   /** Input start */
+   &__input {
+      border: none;
+      width: 1em;
+      flex-grow: 1;
+      color: inherit;
+      font-size: inherit;
+      font-family: inherit;
+      line-height: inherit;
+      padding-left: $paddingLeft;
+      background: inherit;
+
+      &:focus {
+         outline: none;
+      }
+
+      &::placeholder {
+         color: currentColor;
+         opacity: 0.6;
+      }
+   }
+
+   /** Input end */
+   /** Menu start */
+   &__menu {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      right: 0;
+
+      border: 1px solid $borderColor;
+      background: inherit;
+      overflow-x: hidden;
+      overflow-y: auto;
+      pointer-events: none;
+      list-style: none;
+      opacity: 0;
+      z-index: 1;
+
+      &__option {
+         padding-left: $paddingLeft;
+      }
+   }
+
+   .active-option {
+      background: $activeOptionBg;
+   }
+
+   .no-option {
+      opacity: 0.6;
+      text-align: center;
+   }
+
+   .close {
+      height: 0;
+   }
+
+   .open {
+      height: auto;
+      transition: opacity 100ms;
+      opacity: 1;
+      pointer-events: auto;
+   }
+
+   /** Menu end */
+   /** Loading start */
+   &__loading {
+      background-image: url('../assets/preloader.svg');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      animation: fadeIn 500ms forwards;
+   }
+
+   @keyframes fadeIn {
+      from {
+         opacity: 0
+      }
+
+      to {
+         opacity: 0.3
+      }
+   }
+
+   /** Loading end */
+   /** Arrow start */
+   &__arrow {
+      color: $borderColor;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 150ms;
+
+      &__divisor {
+         height: 50%;
+         position: absolute;
+         left: 0;
+         top: 25%;
+         border-right: none !important;
+         border-top: none !important;
+         border-bottom: none !important;
+      }
+
+      &__icon {
+         height: 23%;
+         width: auto;
+      }
+
+      &.hover,
+      &.focus {
+         color: $borderColorHover;
+      }
+   }
+
+   /** Arrow end */
+   /** Borders start */
+   &--border {
+      transition: border-color 150ms;
+      border: 1px solid $borderColor;
+      border-radius: 2px;
+
+      &.hover {
+         border: 1px solid $borderColorHover;
+      }
+
+      &.focus {
+         border: 1px solid $borderColorFocus;
+      }
+   }
+
+   /** Borders end */
+}

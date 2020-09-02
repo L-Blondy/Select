@@ -15,16 +15,11 @@ const TestView = () => {
 	const [ noCleanup, setNoCleanup ] = useState<Option>({ value: '', label: '' })
 
 	const options: Option[] = [
-		{ value: 'opt1', label: '_OPT1' },
-		{ value: 'opt2', label: '_OPT2' },
-		{ value: 'let1', label: '_LET1' },
-		{ value: 'let2', label: '_LET2' },
-		{ value: 'paris', label: '_PARIS' },
-		{ value: 'opt1', label: '_OPT1' },
-		{ value: 'opt2', label: '_OPT2' },
-		{ value: 'let1', label: '_LET1' },
-		{ value: 'let2', label: '_LET2' },
-		{ value: 'paris', label: '_PARIS' },
+		{ value: 'opt1', label: 'opt1' },
+		{ value: 'opt2', label: 'opt2' },
+		{ value: 'let1', label: 'let1' },
+		{ value: 'let2', label: 'let2' },
+		{ value: 'paris', label: 'paris' },
 	]
 
 	return (
@@ -77,17 +72,45 @@ const Div$ = styled.div`
 	padding: 10rem;
 
 	.select {
-		width: 300px;
+		color: #444; 
+		/* height: 50px; */
+		/* width: 200px;
 		margin-bottom: 3rem;
 		font-size: 1.15rem;
 		line-height: 2em;
-		color: #f0f0f0;
-		background: steelblue;
+		color: #444; 
+		background: pink;
 		
+		&--border {
+			border-color: green;
+			border-radius: 10px;
+			overflow: hidden;
 
-		.select__content-wrapper {
-			/* border-color: pink; */
+			&.hover {
+				border-color: red;
+			}
+
+			&.focus {
+				border-color: blue;
+			}
 		}
-	}
+
+		&__arrow {
+			color: green;
+
+			&__divisor {
+				border-color: red;
+			}
+		}
+
+		.no-option {
+			color:blue;
+		}
+
+		.active-option {
+			background: blue;
+			color:white;
+		}
+	} */
 
 `

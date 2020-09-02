@@ -2,8 +2,8 @@ import styled, { StyledComponent } from 'styled-components'
 import React, { useReducer, useRef, useState, useLayoutEffect, useEffect } from 'react'
 import { reducer, Menu, Input, LoadingIndicator, ArrowButton } from './'
 import { BaseProps, OptBase, State, Actions, OpenSource } from 'src/types'
-import { borderColor, borderColorHover, paddingLeft } from 'src/styles'
 import src_preloader from 'src/assets/preloader.svg'
+import { useHover, useFocusWithin } from 'src/hooks'
 
 const noop = () => { }
 
@@ -38,6 +38,8 @@ function SelectBase<Opt extends OptBase>({
 		opt: opt ?? { value: '', label: '' } as Opt
 	})
 
+	const isFocused = useFocusWithin(input.current?.parentElement)
+	const isHovered = useHover(input.current?.parentElement)
 	const currentOption = options[ state.index ]
 	const getInputValue = () => {
 		if (state.isOpen || !withCleanup) {
@@ -45,6 +47,12 @@ function SelectBase<Opt extends OptBase>({
 		}
 		return opt?.label ?? state.opt.label
 	}
+
+	const [ inputHeight, setInputHeight ] = useState<number>(0)
+
+	useLayoutEffect(() => {
+		setInputHeight(input.current.getBoundingClientRect().height)
+	}, [])
 
 	const handle = {
 		pressUp() {
@@ -104,15 +112,11 @@ function SelectBase<Opt extends OptBase>({
 		},
 	}
 
-	const [ inputHeight, setInputHeight ] = useState<number>(0)
 
-	useLayoutEffect(() => {
-		setInputHeight(input.current.getBoundingClientRect().height)
-	}, [])
 
 	return (
-		<Div$
-			inputHeight$={inputHeight}
+		<div
+			// inputHeight$={inputHeight}
 			data-testid='container'
 			className={'select ' + className}
 			onClick={onClick}
@@ -122,7 +126,7 @@ function SelectBase<Opt extends OptBase>({
 
 			<div
 				data-testid='wrapper'
-				className={'select__content-wrapper ' + (input.current === document.activeElement ? 'focus ' : '')}>
+				className={`select--border select__content ${isFocused ? 'focus' : isHovered ? 'hover' : ''}`}>
 
 				<Input
 					ref={input}
@@ -139,17 +143,19 @@ function SelectBase<Opt extends OptBase>({
 					{...props}
 				/>
 				<LoadingIndicator
-					className='select__loading-indicator'
+					className='select__loading'
+					width={inputHeight}
 					when={isLoading}
 				/>
 				<ArrowButton
-					className='select__arrow-button'
+					className={`select-border select__arrow ${isFocused ? 'focus' : isHovered ? 'hover' : ''}`}
+					width={inputHeight}
 					onClick={handle.toggleClick}
 				/>
 			</div>
 
 			<Menu
-				className='select__menu'
+				className='select--border select__menu'
 				index={state.index}
 				isOpen={state.isOpen}
 				options={options}
@@ -157,151 +163,8 @@ function SelectBase<Opt extends OptBase>({
 				onClick={handle.pressEnterOrMenuClick}
 				noOptionsMessage={noOptionsMessage}
 			/>
-		</Div$>
+		</div>
 	)
 }
 
 export default SelectBase
-
-type Props$ = {
-	inputHeight$: number,
-}
-
-const Div$: StyledComponent<'div', any, Props$> = styled.div`
-	position: relative;
-	background: white;
-
-	* {
-		padding: 0;
-		margin: 0;
-		box-sizing: border-box;
-	}
-
-	/** wrapper start */
-	.select__content-wrapper {
-		position: relative;
-		display: flex;
-		border: 1px solid ${borderColor};
-		border-radius: 2px;
-		background: inherit;
-		transition: border-color 200ms;
-
-		&:not(.focus):hover {
-			border-color: ${borderColorHover};
-		}
-		&.focus path,
-		&:hover path {
-			fill: ${borderColorHover}
-		}
-	}
-
-	.focus {
-		border-color: #2d9dff;
-	}
-	/** wrapper end */
-	/** Input start */
-	.select__input {
-		border: none;
-		width: 1em;
-		flex-grow: 1;
-		color: inherit;
-		font-size: inherit;
-		font-family:inherit;
-		line-height: inherit;
-		padding-left: ${paddingLeft};
-		background: inherit;
-
-		&:focus {
-			outline: none;
-		}
-
-		&::placeholder {
-			color: currentColor;
-			opacity: 0.66;
-		}
-	}
-	/** Input end */
-	/** Menu start */
-	.select__menu {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		border: 1px solid #aaa;
-		background: inherit;
-		overflow-x: hidden;
-		overflow-y: auto;
-		pointer-events: none;
-		list-style: none;
-		opacity: 0;
-		z-index:1;
-
-		&__option {
-			padding-left: ${paddingLeft};
-		}
-	}
-
-	.active-option {
-		background: lightblue
-	}
-	.no-option {
-		opacity: 0.66;
-		text-align: center;
-	}
-
-	.open {
-		transition: opacity 100ms;
-		opacity: 1;
-		pointer-events: auto;
-	}
-	/** Menu end */
-	/** Loading-indicator start */
-	.select__loading-indicator {
-		color: red;
-		width: ${(props: { inputHeight$: number }) => props.inputHeight$}px;
-		background-image: url(${src_preloader});
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: contain;
-		margin-right: ${(props: { inputHeight$: number }) => `${props.inputHeight$ / 5}px`};
-		animation: fadeIn 500ms forwards;
-	}
-
-	@keyframes fadeIn {
-		from { opacity: 0}
-		to { opacity: 0.3}
-	}
-	/** Loading-indicator end */
-	/** Arrow-button start */
-	.select__arrow-button {
-		position: relative;
-		cursor: pointer; 
-		display: flex;
-		align-items:center;
-		justify-content: center;
-		height: ${(props: { inputHeight$: number }) => props.inputHeight$}px;
-		width: ${(props: { inputHeight$: number }) => props.inputHeight$}px;
-
-		&::before {
-			content: '';
-			position: absolute;
-			left: 0;
-			top: 25%;
-			bottom: 25%;
-			width: 1px;
-			opacity:0.66;
-			background: ${borderColor};
-		}
-
-		&__icon {
-			height: 27%;
-			width: auto;
-		}
-
-		path {
-			transition: fill 200ms;
-		}	
-	}
-	/** Arrow-button end */
-`
-

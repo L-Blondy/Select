@@ -24,7 +24,7 @@ const Menu = <TOpt extends OptBase>({
 }: Props<TOpt>) => {
 
 	return (
-		<ul className={`${className} ${isOpen ? 'open' : 'close'}`}>
+		<ul className={` ${className} ${isOpen ? 'open' : 'close'}`}>
 			{options.length
 				? (
 					options.map((opt, i) => (
@@ -32,13 +32,13 @@ const Menu = <TOpt extends OptBase>({
 							onMouseDown={e => e.preventDefault()}
 							onMouseOver={() => onMouseOver(i)}
 							onClick={onClick}
-							className={`${className}__option ${i === index ? 'active-option' : ''}`}
+							className={`select__menu__option ${i === index ? 'active-option' : ''}`}
 							key={opt.value + i}>
 							{opt.label}
 						</li>
 					))
 				) : (
-					<li className={`${className}__option no-option`}>{noOptionsMessage}</li>
+					<li className={`select__menu__option no-option`}>{noOptionsMessage}</li>
 				)
 			}
 		</ul>
