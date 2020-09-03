@@ -6,9 +6,9 @@ import { Opt } from 'src/types'
 const noop = () => { }
 
 const TestView = () => {
-	const [ sf, setSf ] = useState<Opt>({ value: '', label: '' })
 	const [ cleanup, setCleanup ] = useState<Opt>({ value: '', label: '' })
 	const [ noCleanup, setNoCleanup ] = useState<Opt>({ value: '', label: '' })
+	const [ sf, setSf ] = useState<Opt>({ value: '', label: '' })
 
 	const options: Opt[] = [
 		{ value: 'opt1', label: 'opt1' },
@@ -18,8 +18,8 @@ const TestView = () => {
 		{ value: 'paris', label: 'paris' },
 	]
 
-	const ref = useRef<HTMLDivElement>(null!)
-	useEffect(() => console.log(ref.current), [ ref.current ])
+	const ref = useRef<HTMLDivElement>(null)
+	useEffect(() => console.log(ref.current), [ ref ])
 	return (
 		<Div$>
 
@@ -72,6 +72,10 @@ const Div$ = styled.div`
 
 	.select {
 		color: #444; 
+
+		/* &.hover {
+			border-color: yellow
+		} */
 		/* border-color: red;
 
 		&.focus {
