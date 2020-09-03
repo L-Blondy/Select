@@ -1,5 +1,5 @@
 import 'src/styles/select.scss'
-import 'src/styles/styles.scss'
+import 'src/styles/customStyles.scss'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';

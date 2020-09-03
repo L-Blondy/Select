@@ -21,4 +21,4 @@ const Arrow: React.FC<Props> = ({
 	)
 }
 
-export default Arrow
+export default React.memo(Arrow)

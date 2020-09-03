@@ -24,6 +24,8 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
 	...props
 }, ref) => {
 
+	console.log('input')
+
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		switch (e.key) {
 			case 'ArrowUp':

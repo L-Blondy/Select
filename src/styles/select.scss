@@ -71,10 +71,10 @@ $noOptionsColor:$placeholderColor;
       list-style: none;
       opacity: 0;
       z-index: 1;
+   }
 
-      &__option {
-         padding-left: $paddingLeft;
-      }
+   &__option {
+      padding-left: $paddingLeft;
    }
 
    .active-option {

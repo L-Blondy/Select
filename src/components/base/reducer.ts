@@ -62,6 +62,18 @@ function reducer(state: State, actions: Actions | Actions[]) {
 					filter: action.filter
 				}
 				break
+			case 'focus':
+				draw = {
+					...draw,
+					isFocused: true
+				}
+				break
+			case 'blur':
+				draw = {
+					...draw,
+					isFocused: false
+				}
+				break
 		}
 	})
 	return draw

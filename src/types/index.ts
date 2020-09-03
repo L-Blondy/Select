@@ -8,10 +8,11 @@ export type State = {
 	index: number
 	isOpen: boolean,
 	filter: string,
-	opt: Opt
+	opt: Opt,
+	isFocused: boolean
 }
 
-export type BaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> & {
+export type BaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value' | 'onMouseEnter' | 'onMouseLeave'> & {
 	options: Opt[]
 	value?: Opt
 	noOptionsMessage?: string
@@ -20,6 +21,8 @@ export type BaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange'
 	onChange?: (value: Opt) => void
 	onOpen?: (openSource: OpenSource) => void
 	onClose?: () => void
+	onMouseEnter?: (e: React.MouseEvent<HTMLDivElement>) => void,
+	onMouseLeave?: (e: React.MouseEvent<HTMLDivElement>) => void,
 	isLoading?: boolean
 	withCleanup?: boolean
 }
@@ -53,6 +56,12 @@ export type Actions =
 	| {
 		type: 'set_filter',
 		filter: string
+	}
+	| {
+		type: 'focus'
+	}
+	| {
+		type: 'blur'
 	}
 
 export enum OpenSource {

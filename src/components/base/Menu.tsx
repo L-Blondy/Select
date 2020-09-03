@@ -30,17 +30,17 @@ const Menu = ({
 							onMouseDown={e => e.preventDefault()}
 							onMouseOver={() => onMouseOver(i)}
 							onClick={onClick}
-							className={`select__menu__option ${i === index ? 'active-option' : ''}`}
+							className={`select__option ${i === index ? 'active-option' : ''}`}
 							key={opt.value + i}>
 							{opt.label}
 						</li>
 					))
 				) : (
-					<li className={`select__menu__option no-option`}>{noOptionsMessage}</li>
+					<li className={`select__option no-option`}>{noOptionsMessage}</li>
 				)
 			}
 		</ul>
 	)
 }
 
-export default Menu
+export default React.memo(Menu)

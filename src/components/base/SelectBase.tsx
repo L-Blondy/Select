@@ -1,4 +1,4 @@
-import React, { useReducer, useRef, forwardRef } from 'react'
+import React, { useReducer, useRef, forwardRef, useState, useCallback, useMemo } from 'react'
 import { reducer, Menu, Input, Loader, Arrow } from './'
 import { BaseProps, State, Actions, OpenSource } from 'src/types'
 import { useHover, useFocusWithin } from 'src/hooks'
@@ -17,6 +17,8 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 	onChange = noop,
 	onInputChange = noop,
 	onInputClick = noop,
+	onMouseEnter = noop,
+	onMouseLeave = noop,
 	placeholder = 'Select...',
 	noOptionsMessage = 'No options',
 	options = [],
@@ -27,62 +29,32 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 	...props
 }, ref) => {
 
-	const selectRef = ref || useRef<HTMLDivElement>(null!)
 	const inputRef = useRef<HTMLInputElement>(null!)
 	const shouldInputClickCallOnOpen = useRef(true)
 	const [ state, dispatch ] = useReducer<(state: State, action: Actions | Actions[]) => State>(reducer, {
 		index: 0,
 		isOpen: false,
 		filter: opt?.label || '',
-		opt: opt ?? { value: '', label: '' }
+		opt: opt ?? { value: '', label: '' },
+		isFocused: false
 	})
+	const [ isHovered, setIsHovered ] = useState(false)
 
-	type SelectRef = React.MutableRefObject<HTMLDivElement | null>
-	const isFocused = useFocusWithin(selectRef as SelectRef)
-	const isHovered = useHover(selectRef as SelectRef)
 	const currentOption = options[ state.index ]
 
-	const handle = {
-		pressUp() {
-			dispatch({ type: 'prev_index', options })
+	const handleSelect = useMemo(() => ({
+		mouseEnter(e: React.MouseEvent<HTMLDivElement>) {
+			onMouseEnter(e)
+			setIsHovered(true)
 		},
-		pressDown() {
-			dispatch({ type: 'next_index', options })
+		mouseLeave(e: React.MouseEvent<HTMLDivElement>) {
+			onMouseLeave(e)
+			setIsHovered(false)
 		},
-		pressEnterOrMenuClick() {
-			if (!state.isOpen) {
-				dispatch({ type: 'open', source: OpenSource.pressEnter, clear: withCleanup })
-				onOpen(OpenSource.pressEnter)
-				return
-			}
-			currentOption && dispatch({ type: 'select', opt: currentOption })
-			onClose()
-			shouldInputClickCallOnOpen.current = true
-			options.length && onChange(currentOption)
-		},
-		focus(e: React.FocusEvent<HTMLInputElement>) {
-			dispatch({ type: 'open', source: OpenSource.focus, clear: withCleanup })
-			onFocus(e)
-			onOpen(OpenSource.focus)
-			shouldInputClickCallOnOpen.current = false
-		},
-		blur(e: React.FocusEvent<HTMLInputElement>) {
-			dispatch({ type: 'close', clear: withCleanup })
-			onBlur(e)
-			if (!state.isOpen) return
-			onClose()
-			shouldInputClickCallOnOpen.current = true
-		},
-		inputClick() {
-			dispatch({ type: 'open', source: OpenSource.inputClick, clear: withCleanup })
-			onInputClick()
-			if (shouldInputClickCallOnOpen.current && !state.isOpen)
-				onOpen(OpenSource.inputClick)
-		},
-		mouseOverMenu(index: number) {
-			dispatch({ type: 'set_index', index })
-		},
-		inputChange(filter: string) {
+	}), [ onMouseEnter, onMouseLeave ])
+
+	const handleInput = useMemo(() => ({
+		change(filter: string) {
 			if (!state.isOpen) {
 				dispatch({ type: 'open', source: OpenSource.inputChange, clear: withCleanup })
 				onOpen(OpenSource.inputChange)
@@ -93,12 +65,64 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 			])
 			onInputChange(filter)
 		},
-		toggleClick(e: React.MouseEvent<HTMLDivElement>) {
+		pressUp() {
+			dispatch({ type: 'prev_index', options })
+		},
+		pressDown() {
+			dispatch({ type: 'next_index', options })
+		},
+		focus(e: React.FocusEvent<HTMLInputElement>) {
+			dispatch([
+				{ type: 'open', source: OpenSource.focus, clear: withCleanup },
+				{ type: 'focus' }
+			])
+			onFocus(e)
+			onOpen(OpenSource.focus)
+			shouldInputClickCallOnOpen.current = false
+		},
+		blur(e: React.FocusEvent<HTMLInputElement>) {
+			dispatch([
+				{ type: 'close', clear: withCleanup },
+				{ type: 'blur' }
+			])
+			onBlur(e)
+			if (!state.isOpen) return
+			onClose()
+			shouldInputClickCallOnOpen.current = true
+		},
+		click() {
+			dispatch({ type: 'open', source: OpenSource.inputClick, clear: withCleanup })
+			onInputClick()
+			if (shouldInputClickCallOnOpen.current && !state.isOpen)
+				onOpen(OpenSource.inputClick)
+		},
+	}), [ onBlur, onClose, onFocus, onInputChange, onInputClick, onOpen, options, state.isOpen, withCleanup ])
+
+	const handlePressEnterOrMenuClick = useCallback(() => {
+		if (!state.isOpen) {
+			dispatch({ type: 'open', source: OpenSource.pressEnter, clear: withCleanup })
+			onOpen(OpenSource.pressEnter)
+			return
+		}
+		currentOption && dispatch({ type: 'select', opt: currentOption })
+		onClose()
+		shouldInputClickCallOnOpen.current = true
+		options.length && onChange(currentOption)
+	}, [ currentOption, onChange, onClose, onOpen, options.length, state.isOpen, withCleanup ])
+
+	const handleMenu = useMemo(() => ({
+		mouseOver(index: number) {
+			dispatch({ type: 'set_index', index })
+		}
+	}), [])
+
+	const handleArrow = useMemo(() => ({
+		click(e: React.MouseEvent<HTMLDivElement>) {
 			e.stopPropagation()
 			inputRef.current.focus()
 			inputRef.current.click()
-		},
-	}
+		}
+	}), [])
 
 	const getInputValue = () => {
 		if (state.isOpen || !withCleanup) {
@@ -109,10 +133,12 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 
 	return (
 		<div
-			ref={selectRef}
+			ref={ref}
 			data-testid='select'
-			className={`select ${className} ${isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
+			className={`select ${className} ${state.isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
 			onClick={onClick}
+			onMouseEnter={handleSelect.mouseEnter}
+			onMouseLeave={handleSelect.mouseLeave}
 			onTouchEnd={onTouchEnd}
 			onTouchMove={onTouchMove}
 			onTouchStart={onTouchStart}>
@@ -123,13 +149,13 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 				className='select__input'
 				placeholder={(opt?.label ?? state.opt.label) || placeholder}
 				value={getInputValue()}
-				onChange={handle.inputChange}
-				onPressUp={handle.pressUp}
-				onPressDown={handle.pressDown}
-				onPressEnter={handle.pressEnterOrMenuClick}
-				onFocus={handle.focus}
-				onBlur={handle.blur}
-				onClick={handle.inputClick}
+				onChange={handleInput.change}
+				onPressUp={handleInput.pressUp}
+				onPressDown={handleInput.pressDown}
+				onPressEnter={handlePressEnterOrMenuClick}
+				onFocus={handleInput.focus}
+				onBlur={handleInput.blur}
+				onClick={handleInput.click}
 				{...props}
 			/>
 
@@ -145,8 +171,8 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 
 			<Arrow
 				data-testid='select__arrow'
-				className={`select__arrow ${isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
-				onClick={handle.toggleClick}
+				className={`select__arrow ${state.isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
+				onClick={handleArrow.click}
 			/>
 
 			<Menu
@@ -154,8 +180,8 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 				className={`select__menu ${state.isOpen ? 'open' : 'close'}`}
 				index={state.index}
 				options={options}
-				onMouseOver={handle.mouseOverMenu}
-				onClick={handle.pressEnterOrMenuClick}
+				onMouseOver={handleMenu.mouseOver}
+				onClick={handlePressEnterOrMenuClick}
 				noOptionsMessage={noOptionsMessage}
 			/>
 		</div>
