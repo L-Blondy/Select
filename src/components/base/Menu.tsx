@@ -1,10 +1,10 @@
 import React from 'react'
-import { OptBase } from 'src/types'
+import { Opt } from 'src/types'
 
 const noop = () => { }
 
-type Props<TOpt> = {
-	options: TOpt[]
+type Props = {
+	options: Opt[]
 	onMouseOver: (index: number) => void
 	onClick: (e: React.MouseEvent<HTMLLIElement>) => void
 	index: number
@@ -12,14 +12,14 @@ type Props<TOpt> = {
 	className: string
 }
 
-const Menu = <TOpt extends OptBase>({
+const Menu = ({
 	options,
 	onMouseOver = noop,
 	onClick = noop,
 	index,
 	noOptionsMessage,
 	className
-}: Props<TOpt>) => {
+}: Props) => {
 
 	return (
 		<ul className={className}>

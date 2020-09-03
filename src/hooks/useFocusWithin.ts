@@ -1,19 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
 
-function useIsFocused(elRef: React.MutableRefObject<HTMLDivElement> | null): boolean {
-
+function useIsFocused(elRef: React.MutableRefObject<HTMLElement | null> | null): boolean {
 
 	const [ isFocused, setIsFocused ] = useState(false)
 
 	const handleFocus = useCallback((e: FocusEvent) => {
-		if (!elRef) return
+		if (!elRef || !elRef.current) return
 		const el = elRef.current
 		if (el.contains(e.target as Node))
 			setIsFocused(true)
 	}, [ elRef ])
 
 	const handleBlur = useCallback((e: FocusEvent) => {
-		if (!elRef) return
+		if (!elRef || !elRef.current) return
 		const el = elRef.current
 		if (el.contains(e.target as Node))
 			setIsFocused(false)

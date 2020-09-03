@@ -1,13 +1,11 @@
-import styled, { StyledComponent } from 'styled-components'
-import React, { useReducer, useRef, useState, useLayoutEffect, useEffect, forwardRef } from 'react'
+import React, { useReducer, useRef, forwardRef } from 'react'
 import { reducer, Menu, Input, Loader, Arrow } from './'
-import { BaseProps, OptBase, State, Actions, OpenSource } from 'src/types'
-import src_preloader from 'src/assets/preloader.svg'
+import { BaseProps, State, Actions, OpenSource } from 'src/types'
 import { useHover, useFocusWithin } from 'src/hooks'
 
 const noop = () => { }
 
-const SelectBase = <Opt extends OptBase>({
+const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 	onOpen = noop,
 	onClose = noop,
 	onFocus = noop,
@@ -27,27 +25,22 @@ const SelectBase = <Opt extends OptBase>({
 	className = '',
 	withCleanup = true,
 	...props
-}: BaseProps<Opt>) => {
+}, ref) => {
 
-	const selectRef = useRef<HTMLDivElement>(null!)
+	const selectRef = ref || useRef<HTMLDivElement>(null!)
 	const inputRef = useRef<HTMLInputElement>(null!)
 	const shouldInputClickCallOnOpen = useRef(true)
-	const [ state, dispatch ] = useReducer<(state: State<Opt>, action: Actions<Opt> | Actions<Opt>[]) => State<Opt>>(reducer, {
+	const [ state, dispatch ] = useReducer<(state: State, action: Actions | Actions[]) => State>(reducer, {
 		index: 0,
 		isOpen: false,
 		filter: opt?.label || '',
-		opt: opt ?? { value: '', label: '' } as Opt
+		opt: opt ?? { value: '', label: '' }
 	})
 
-	const isFocused = useFocusWithin(selectRef)
-	const isHovered = useHover(selectRef)
+	type SelectRef = React.MutableRefObject<HTMLDivElement | null>
+	const isFocused = useFocusWithin(selectRef as SelectRef)
+	const isHovered = useHover(selectRef as SelectRef)
 	const currentOption = options[ state.index ]
-	const getInputValue = () => {
-		if (state.isOpen || !withCleanup) {
-			return state.filter
-		}
-		return opt?.label ?? state.opt.label
-	}
 
 	const handle = {
 		pressUp() {
@@ -107,10 +100,17 @@ const SelectBase = <Opt extends OptBase>({
 		},
 	}
 
+	const getInputValue = () => {
+		if (state.isOpen || !withCleanup) {
+			return state.filter
+		}
+		return opt?.label ?? state.opt.label
+	}
+
 	return (
 		<div
 			ref={selectRef}
-			data-testid='container'
+			data-testid='select'
 			className={`select ${className} ${isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
 			onClick={onClick}
 			onTouchEnd={onTouchEnd}
@@ -119,6 +119,7 @@ const SelectBase = <Opt extends OptBase>({
 
 			<Input
 				ref={inputRef}
+				data-testid='select__input'
 				className='select__input'
 				placeholder={(opt?.label ?? state.opt.label) || placeholder}
 				value={getInputValue()}
@@ -131,18 +132,25 @@ const SelectBase = <Opt extends OptBase>({
 				onClick={handle.inputClick}
 				{...props}
 			/>
+
 			<Loader
+				data-testid='select__loader'
 				className={`select__loader ${isLoading ? '' : 'select__loader--hidden'} `}
 			/>
 
-			<div className={'select__divisor'} />
+			<div
+				data-testid='select__divisor'
+				className={'select__divisor'}
+			/>
 
 			<Arrow
+				data-testid='select__arrow'
 				className={`select__arrow ${isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
 				onClick={handle.toggleClick}
 			/>
 
 			<Menu
+				data-testid='select__menu'
 				className={`select__menu ${state.isOpen ? 'open' : 'close'}`}
 				index={state.index}
 				options={options}
@@ -152,6 +160,6 @@ const SelectBase = <Opt extends OptBase>({
 			/>
 		</div>
 	)
-}
+})
 
 export default SelectBase

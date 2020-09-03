@@ -1,20 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { SelectAsync, SelectFiltered } from 'src/components'
+import { Opt } from 'src/types'
 
 const noop = () => { }
 
-type Option = {
-	value: string
-	label: string
-}
-
 const TestView = () => {
-	const [ sf, setSf ] = useState<Option>({ value: '', label: '' })
-	const [ cleanup, setCleanup ] = useState<Option>({ value: '', label: '' })
-	const [ noCleanup, setNoCleanup ] = useState<Option>({ value: '', label: '' })
+	const [ sf, setSf ] = useState<Opt>({ value: '', label: '' })
+	const [ cleanup, setCleanup ] = useState<Opt>({ value: '', label: '' })
+	const [ noCleanup, setNoCleanup ] = useState<Opt>({ value: '', label: '' })
 
-	const options: Option[] = [
+	const options: Opt[] = [
 		{ value: 'opt1', label: 'opt1' },
 		{ value: 'opt2', label: 'opt2' },
 		{ value: 'let1', label: 'let1' },
@@ -22,6 +18,8 @@ const TestView = () => {
 		{ value: 'paris', label: 'paris' },
 	]
 
+	const ref = useRef<HTMLDivElement>(null!)
+	useEffect(() => console.log(ref.current), [ ref.current ])
 	return (
 		<Div$>
 
@@ -34,6 +32,7 @@ const TestView = () => {
 
 			<h1>Async Without cleanup</h1>
 			<SelectAsync
+				ref={ref}
 				className='async-shit'
 				onChange={setNoCleanup}
 				value={noCleanup}

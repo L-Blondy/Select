@@ -1,21 +1,21 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, forwardRef } from 'react'
 import { useAsync, useDebounce } from 'src/hooks'
 import { SelectBase } from './base'
 import { fetchCities } from 'src/API'
-import { BaseProps, OptBase, OpenSource } from 'src/types'
+import { BaseProps, Opt, OpenSource } from 'src/types'
 
 const noop = () => { }
 
-interface Props<Opt> extends Omit<BaseProps<Opt>, 'isLoading' | 'options'> { }
+interface Props extends Omit<BaseProps, 'isLoading' | 'options'> { }
 
-function SelectAsync<Opt extends OptBase>({
+const SelectAsync = forwardRef<HTMLDivElement, Props>(({
 	onInputChange = noop,
 	onOpen = noop,
 	onClose = noop,
 	withCleanup = true,
-	value: opt = { value: '', label: '' } as Opt,
+	value: opt = { value: '', label: '' },
 	...props
-}: Props<Opt>) {
+}, ref) => {
 
 	const [ debouncedCallback, cancel ] = useDebounce(fetchCities, 1000)
 	const [ { isPending, data: options }, execute, setState ] = useAsync(debouncedCallback, 'fetchCities')
@@ -56,9 +56,10 @@ function SelectAsync<Opt extends OptBase>({
 			onInputChange={handleInputChange}
 			onOpen={handleOpen}
 			withCleanup={withCleanup}
+			ref={ref}
 			{...props}
 		/>
 	)
-}
+})
 
 export default SelectAsync

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 
-function useIsHovered(elRef: React.MutableRefObject<HTMLDivElement> | null): boolean {
+function useIsHovered(elRef: React.MutableRefObject<HTMLDivElement | null> | null): boolean {
 
 	const [ isHovered, setIsHovered ] = useState(false)
 
@@ -10,6 +10,7 @@ function useIsHovered(elRef: React.MutableRefObject<HTMLDivElement> | null): boo
 
 	useEffect(() => {
 		if (!elRef) return
+		if (!elRef.current) return
 		const el = elRef.current
 		el.addEventListener('mouseenter', setTruthy)
 		el.addEventListener('mouseleave', setFalsy)

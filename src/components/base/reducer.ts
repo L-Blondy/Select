@@ -1,8 +1,8 @@
-import { State, Actions, OptBase } from 'src/types'
+import { State, Actions } from 'src/types'
 
-function reducer<Opt extends OptBase>(state: State<Opt>, actions: Actions<Opt> | Actions<Opt>[]) {
+function reducer(state: State, actions: Actions | Actions[]) {
 
-	actions = (actions as Actions<Opt>[]).length ? actions as Actions<Opt>[] : [ actions ] as Actions<Opt>[]
+	actions = (actions as Actions[]).length ? actions as Actions[] : [ actions ] as Actions[]
 
 	let draw = { ...state }
 

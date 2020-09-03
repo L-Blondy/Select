@@ -1,12 +1,17 @@
-export type OptBase = { value: string, label: string }
+export type Opt = {
+	value: string,
+	label: string,
+	[ key: string ]: any
+}
 
-export type State<TOpt> = {
+export type State = {
 	index: number
 	isOpen: boolean,
 	filter: string,
-	opt: TOpt
+	opt: Opt
 }
-export type BaseProps<Opt> = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> & {
+
+export type BaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'value'> & {
 	options: Opt[]
 	value?: Opt
 	noOptionsMessage?: string
@@ -19,18 +24,18 @@ export type BaseProps<Opt> = Omit<React.ComponentPropsWithoutRef<'input'>, 'onCh
 	withCleanup?: boolean
 }
 
-export type Actions<TOpt> =
+export type Actions =
 	| {
 		type: 'set_index',
 		index: number
 	}
 	| {
 		type: 'prev_index',
-		options: TOpt[]
+		options: Opt[]
 	}
 	| {
 		type: 'next_index',
-		options: TOpt[]
+		options: Opt[]
 	}
 	| {
 		type: 'open',
@@ -43,7 +48,7 @@ export type Actions<TOpt> =
 	}
 	| {
 		type: 'select',
-		opt: TOpt
+		opt: Opt
 	}
 	| {
 		type: 'set_filter',

@@ -1,8 +1,8 @@
 import React from 'react'
 
-type TProps = React.ComponentPropsWithoutRef<'div'>
+type Props = React.ComponentPropsWithoutRef<'div'>
 
-const Arrow: React.FC<TProps> = ({
+const Arrow: React.FC<Props> = ({
 	className,
 	...props }) => {
 

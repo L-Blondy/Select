@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
-import { BaseProps, OptBase } from 'src/types'
+import { BaseProps } from 'src/types'
 import SelectBase from './base/SelectBase'
 
 const noop = () => { }
 
-interface Props<Opt> extends Omit<BaseProps<Opt>, 'isLoading' | 'withCleanup'> { }
+interface Props extends Omit<BaseProps, 'isLoading' | 'withCleanup'> { }
 
-function SelectFiltered<Opt extends OptBase>({
+function SelectFiltered({
 	options: defaultOptions,
 	onInputChange = noop,
 	onClose = noop,
 	...props
-}: Props<Opt>) {
+}: Props) {
 
 	const [ options, setOptions ] = useState(defaultOptions)
 
