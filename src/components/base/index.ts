@@ -1,6 +1,6 @@
-export { default as ArrowButton } from './ArrowButton'
+export { default as Arrow } from './Arrow'
 export { default as Input } from './Input'
-export { default as LoadingIndicator } from './LoadingIndicator'
+export { default as Loader } from './Loader'
 export { default as Menu } from './Menu'
 export { default as reducer } from './reducer'
 export { default as SelectBase } from './SelectBase'

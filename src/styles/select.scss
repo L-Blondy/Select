@@ -1,0 +1,199 @@
+$borderColor: #999;
+$borderColorHover: #666;
+$borderColorFocus: #2d9dff;
+$activeOptionBg: #dff2fb;
+$paddingLeft: 0.4em;
+$loaderColor: rgba(0, 0, 0, 0.33);
+
+.select {
+   position: relative;
+   background: white;
+   line-height: 1.7em;
+   height: 30px;
+   width: 200px;
+   border: 1px solid $borderColor;
+   display: flex;
+   border-radius: 3px;
+   box-sizing: border-box;
+   box-shadow: transparent 0 0 0 1px;
+
+   &.focus {
+      border-color: $borderColorFocus;
+      box-shadow: $borderColorFocus 0 0 0 1px;
+   }
+
+   &.hover {
+      border-color: $borderColorHover;
+   }
+
+   /** wrapper end */
+   /** Input start */
+   &__input {
+      border: none;
+      background: none;
+      width: 1em;
+      flex-grow: 1;
+      color: inherit;
+      font-size: inherit;
+      font-family: inherit;
+      line-height: inherit;
+      padding-left: $paddingLeft;
+      padding-right: $paddingLeft;
+
+      &:focus {
+         outline: none;
+      }
+
+      &::placeholder {
+         color: currentColor;
+         opacity: 0.6;
+      }
+   }
+
+   /** Input end */
+   /** Menu start */
+   &__menu {
+      box-sizing: initial;
+      position: absolute;
+      top: calc(100% + 4px);
+      width: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 1px solid $borderColor;
+      background: inherit;
+      border-radius: inherit;
+      overflow-x: hidden;
+      overflow-y: auto;
+      pointer-events: none;
+      list-style: none;
+      opacity: 0;
+      z-index: 1;
+
+      &__option {
+         padding-left: $paddingLeft;
+      }
+   }
+
+   .active-option {
+      background: $activeOptionBg;
+   }
+
+   .no-option {
+      opacity: 0.6;
+      text-align: center;
+   }
+
+   .close {
+      height: 0;
+   }
+
+   .open {
+      height: auto;
+      transition: opacity 100ms;
+      opacity: 1;
+      pointer-events: auto;
+   }
+
+   /** Menu end */
+   /** Loader start */
+   &__loader {
+      color: $loaderColor;
+      height: 100%;
+      transform-origin: right;
+      max-width: 100%;
+      transition: max-width 200ms, opacity 200ms;
+
+      &--hidden {
+         max-width: 0;
+         opacity: 0;
+      }
+   }
+
+   .svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+   }
+
+   .circle {
+      animation: animate 1100ms infinite;
+      transform-origin: center center;
+   }
+
+   .circle:nth-child(1) {
+      animation-delay: 0;
+   }
+
+   .circle:nth-child(2) {
+      animation-delay: 150ms;
+   }
+
+   .circle:nth-child(3) {
+      animation-delay: 300ms;
+   }
+
+   @keyframes animate {
+      0% {
+         transform: scale(1);
+         opacity: 0.5;
+      }
+
+      25% {
+         transform: scale(0.95);
+         opacity: 0.5;
+      }
+
+      50% {
+         transform: scale(1.05);
+         opacity: 1;
+      }
+
+      75% {
+         transform: scale(1);
+         opacity: 0.6;
+      }
+
+      100% {
+         transform: scale(1);
+         opacity: 0.5;
+      }
+   }
+
+   /** Loader end */
+   /** Divisor start */
+   &__divisor {
+      height: 50%;
+      align-self: center;
+      border-left: 1px solid $borderColor;
+      border-right: none !important;
+      border-top: none !important;
+      border-bottom: none !important;
+   }
+
+   /** Divisor end */
+   /** Arrow start */
+   &__arrow {
+      position: relative;
+      cursor: pointer;
+      transition: color 150ms;
+      height: 100%;
+      color: $borderColor;
+
+      &.hover,
+      &.focus {
+         color: $borderColorHover;
+      }
+   }
+
+   /** Borders end */
+   /** SVG start */
+   svg {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+   }
+
+   /** SVG end */
+}

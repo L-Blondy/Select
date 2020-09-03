@@ -1,21 +1,23 @@
 import { useState, useEffect, useCallback } from 'react'
 
-function useIsFocused(el: HTMLElement | null): boolean {
+function useIsFocused(elRef: React.MutableRefObject<HTMLDivElement> | null): boolean {
 
 
 	const [ isFocused, setIsFocused ] = useState(false)
 
 	const handleFocus = useCallback((e: FocusEvent) => {
-		if (!el) return
+		if (!elRef) return
+		const el = elRef.current
 		if (el.contains(e.target as Node))
 			setIsFocused(true)
-	}, [ el ])
+	}, [ elRef ])
 
 	const handleBlur = useCallback((e: FocusEvent) => {
-		if (!el) return
+		if (!elRef) return
+		const el = elRef.current
 		if (el.contains(e.target as Node))
 			setIsFocused(false)
-	}, [ el ])
+	}, [ elRef ])
 
 	useEffect(() => {
 		document.addEventListener('focusin', handleFocus)
@@ -25,7 +27,7 @@ function useIsFocused(el: HTMLElement | null): boolean {
 			document.removeEventListener('focusin', handleFocus)
 			document.removeEventListener('focusout', handleBlur)
 		}
-	}, [ el, handleFocus, handleBlur ])
+	}, [ handleFocus, handleBlur ])
 
 	return isFocused
 }

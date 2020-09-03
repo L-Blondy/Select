@@ -7,7 +7,6 @@ type Props<TOpt> = {
 	options: TOpt[]
 	onMouseOver: (index: number) => void
 	onClick: (e: React.MouseEvent<HTMLLIElement>) => void
-	isOpen: boolean
 	index: number
 	noOptionsMessage: string
 	className: string
@@ -17,14 +16,13 @@ const Menu = <TOpt extends OptBase>({
 	options,
 	onMouseOver = noop,
 	onClick = noop,
-	isOpen,
 	index,
 	noOptionsMessage,
 	className
 }: Props<TOpt>) => {
 
 	return (
-		<ul className={` ${className} ${isOpen ? 'open' : 'close'}`}>
+		<ul className={className}>
 			{options.length
 				? (
 					options.map((opt, i) => (

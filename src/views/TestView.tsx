@@ -73,7 +73,13 @@ const Div$ = styled.div`
 
 	.select {
 		color: #444; 
-		/* height: 50px; */
+		/* border-color: red;
+
+		&.focus {
+			border-color: black;
+		} */
+		/* line-height: 30px; */
+		/* height: 32px; */
 		/* width: 200px;
 		margin-bottom: 3rem;
 		font-size: 1.15rem;

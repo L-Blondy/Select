@@ -1,13 +1,13 @@
 import styled, { StyledComponent } from 'styled-components'
-import React, { useReducer, useRef, useState, useLayoutEffect, useEffect } from 'react'
-import { reducer, Menu, Input, LoadingIndicator, ArrowButton } from './'
+import React, { useReducer, useRef, useState, useLayoutEffect, useEffect, forwardRef } from 'react'
+import { reducer, Menu, Input, Loader, Arrow } from './'
 import { BaseProps, OptBase, State, Actions, OpenSource } from 'src/types'
 import src_preloader from 'src/assets/preloader.svg'
 import { useHover, useFocusWithin } from 'src/hooks'
 
 const noop = () => { }
 
-function SelectBase<Opt extends OptBase>({
+const SelectBase = <Opt extends OptBase>({
 	onOpen = noop,
 	onClose = noop,
 	onFocus = noop,
@@ -27,9 +27,10 @@ function SelectBase<Opt extends OptBase>({
 	className = '',
 	withCleanup = true,
 	...props
-}: BaseProps<Opt>) {
+}: BaseProps<Opt>) => {
 
-	const input = useRef<HTMLInputElement>(null!)
+	const selectRef = useRef<HTMLDivElement>(null!)
+	const inputRef = useRef<HTMLInputElement>(null!)
 	const shouldInputClickCallOnOpen = useRef(true)
 	const [ state, dispatch ] = useReducer<(state: State<Opt>, action: Actions<Opt> | Actions<Opt>[]) => State<Opt>>(reducer, {
 		index: 0,
@@ -38,8 +39,8 @@ function SelectBase<Opt extends OptBase>({
 		opt: opt ?? { value: '', label: '' } as Opt
 	})
 
-	const isFocused = useFocusWithin(input.current?.parentElement)
-	const isHovered = useHover(input.current?.parentElement)
+	const isFocused = useFocusWithin(selectRef)
+	const isHovered = useHover(selectRef)
 	const currentOption = options[ state.index ]
 	const getInputValue = () => {
 		if (state.isOpen || !withCleanup) {
@@ -47,12 +48,6 @@ function SelectBase<Opt extends OptBase>({
 		}
 		return opt?.label ?? state.opt.label
 	}
-
-	const [ inputHeight, setInputHeight ] = useState<number>(0)
-
-	useLayoutEffect(() => {
-		setInputHeight(input.current.getBoundingClientRect().height)
-	}, [])
 
 	const handle = {
 		pressUp() {
@@ -107,57 +102,49 @@ function SelectBase<Opt extends OptBase>({
 		},
 		toggleClick(e: React.MouseEvent<HTMLDivElement>) {
 			e.stopPropagation()
-			input.current.focus()
-			input.current.click()
+			inputRef.current.focus()
+			inputRef.current.click()
 		},
 	}
 
-
-
 	return (
 		<div
-			// inputHeight$={inputHeight}
+			ref={selectRef}
 			data-testid='container'
-			className={'select ' + className}
+			className={`select ${className} ${isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
 			onClick={onClick}
 			onTouchEnd={onTouchEnd}
 			onTouchMove={onTouchMove}
 			onTouchStart={onTouchStart}>
 
-			<div
-				data-testid='wrapper'
-				className={`select--border select__content ${isFocused ? 'focus' : isHovered ? 'hover' : ''}`}>
+			<Input
+				ref={inputRef}
+				className='select__input'
+				placeholder={(opt?.label ?? state.opt.label) || placeholder}
+				value={getInputValue()}
+				onChange={handle.inputChange}
+				onPressUp={handle.pressUp}
+				onPressDown={handle.pressDown}
+				onPressEnter={handle.pressEnterOrMenuClick}
+				onFocus={handle.focus}
+				onBlur={handle.blur}
+				onClick={handle.inputClick}
+				{...props}
+			/>
+			<Loader
+				className={`select__loader ${isLoading ? '' : 'select__loader--hidden'} `}
+			/>
 
-				<Input
-					ref={input}
-					className='select__input'
-					placeholder={(opt?.label ?? state.opt.label) || placeholder}
-					value={getInputValue()}
-					onChange={handle.inputChange}
-					onPressUp={handle.pressUp}
-					onPressDown={handle.pressDown}
-					onPressEnter={handle.pressEnterOrMenuClick}
-					onFocus={handle.focus}
-					onBlur={handle.blur}
-					onClick={handle.inputClick}
-					{...props}
-				/>
-				<LoadingIndicator
-					className='select__loading'
-					width={inputHeight}
-					when={isLoading}
-				/>
-				<ArrowButton
-					className={`select-border select__arrow ${isFocused ? 'focus' : isHovered ? 'hover' : ''}`}
-					width={inputHeight}
-					onClick={handle.toggleClick}
-				/>
-			</div>
+			<div className={'select__divisor'} />
+
+			<Arrow
+				className={`select__arrow ${isFocused ? 'focus' : isHovered ? 'hover' : ''} `}
+				onClick={handle.toggleClick}
+			/>
 
 			<Menu
-				className='select--border select__menu'
+				className={`select__menu ${state.isOpen ? 'open' : 'close'}`}
 				index={state.index}
-				isOpen={state.isOpen}
 				options={options}
 				onMouseOver={handle.mouseOverMenu}
 				onClick={handle.pressEnterOrMenuClick}
