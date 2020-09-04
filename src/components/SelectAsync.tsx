@@ -24,7 +24,7 @@ const SelectAsync = forwardRef<HTMLDivElement, Props>(({
 }, ref) => {
 
 	const [ debouncedCallback, cancel ] = useDebounce(callback, debounceMs)
-	const [ { isPending, data: options }, execute, setState ] = useAsync(debouncedCallback, 'fetchCities', withCache)
+	const [ { isPending, data: options }, execute, setState ] = useAsync<(keyword: string) => Promise<Opt[]>>(debouncedCallback, 'fetchCities', withCache)
 	const lastKeyword = useRef(opt?.label || '')
 
 	const reset = () => {

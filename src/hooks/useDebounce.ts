@@ -6,7 +6,7 @@ type DebouncedFn<T extends AnyFunction> = (...args: Parameters<T>) => Promise<Fn
 const useDebounce = <T extends AnyFunction>(
 	callback: T,
 	delay: number = 300
-): [ (T | DebouncedFn<T>), () => void ] => {
+): [ DebouncedFn<T>, () => void ] => {
 
 	const callbackRef = useRef(callback)
 	const delayRef = useRef(delay)

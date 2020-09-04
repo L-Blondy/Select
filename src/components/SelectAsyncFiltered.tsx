@@ -1,7 +1,7 @@
-import React, { useRef, forwardRef, useEffect } from 'react'
+import React, { useRef, forwardRef, useEffect, useMemo } from 'react'
 import { SelectBase } from 'src/components/base'
 import { FnReturningPromise, Opt, BaseProps, OpenSource } from 'src/types'
-import { useDebounce, useAsync } from 'src/hooks'
+import { useDebounce, useAsync, useReRender } from 'src/hooks'
 
 const noop = () => { }
 
@@ -23,14 +23,14 @@ const SelectAsyncFiltered = forwardRef<HTMLDivElement, Props>(({
 }, ref) => {
 
 	const [ debouncedCallback, cancel ] = useDebounce(callback, debounceMs)
-	const [ requestState, execute, setRequestState ] = useAsync(debouncedCallback, 'fetchCities')
+	const [ requestState, execute, setRequestState ] = useAsync<(keyword: string) => Promise<Opt[]>>(debouncedCallback, 'fetchCities')
 	const lastKeyword = useRef(opt?.label || '')
 	const dataKeyword = useRef<string>('')
+	const reRender = useReRender()
 
 	useEffect(() => {
 		if (requestState.status !== 'success') return
 		dataKeyword.current = (requestState.args || [ '' ])[ 0 ]
-		console.log('success', requestState.args, requestState.data)
 	}, [ requestState ])
 
 	const reset = () => {
@@ -45,8 +45,10 @@ const SelectAsyncFiltered = forwardRef<HTMLDivElement, Props>(({
 
 	const handleInputChange = (keyword: string) => {
 		lastKeyword.current = keyword
-		console.log(dataKeyword.current)
-		if (requestState.data?.length && keyword.indexOf(dataKeyword.current) === 0) return
+		if (requestState.data?.length && keyword.indexOf(dataKeyword.current) === 0) {
+			reRender()
+			return
+		}
 		keyword
 			? execute(keyword)
 			: reset()
@@ -63,7 +65,7 @@ const SelectAsyncFiltered = forwardRef<HTMLDivElement, Props>(({
 		execute(lastKeyword.current)
 	}
 
-	const options = (requestState.data as Opt[] || []).filter((opt => filterFn(opt, lastKeyword.current)))
+	const options = (requestState.data as Opt[] || []).filter((option) => filterFn(option, lastKeyword.current))
 
 	return (
 		<SelectBase
