@@ -37,7 +37,7 @@ function reducer(state: State, actions: Actions | Actions[]) {
 				draw = {
 					...draw,
 					isOpen: false,
-					filter: action.clear ? draw.opt.label : draw.filter
+					keyword: action.clear ? draw.opt.label : draw.keyword
 				}
 				break
 			case 'open':
@@ -45,7 +45,7 @@ function reducer(state: State, actions: Actions | Actions[]) {
 					...draw,
 					isOpen: true,
 					index: 0,
-					filter: action.source === 'inputChange' || !action.clear ? draw.filter : ''
+					keyword: action.source === 'inputChange' || !action.clear ? draw.keyword : ''
 				}
 				break
 			case 'select':
@@ -53,13 +53,13 @@ function reducer(state: State, actions: Actions | Actions[]) {
 					...draw,
 					isOpen: false,
 					opt: action.opt,
-					filter: action.opt.label
+					keyword: action.opt.label
 				}
 				break
-			case 'set_filter':
+			case 'set_keyword':
 				draw = {
 					...draw,
-					filter: action.filter
+					keyword: action.keyword
 				}
 				break
 			case 'focus':

@@ -1,24 +1,30 @@
 import React, { useRef, forwardRef } from 'react'
 import { useAsync, useDebounce } from 'src/hooks'
 import { SelectBase } from './base'
-import { fetchCities } from 'src/API'
-import { BaseProps, Opt, OpenSource } from 'src/types'
+import { BaseProps, Opt, OpenSource, FnReturningPromise } from 'src/types'
 
 const noop = () => { }
 
-interface Props extends Omit<BaseProps, 'isLoading' | 'options'> { }
+interface Props extends Omit<BaseProps, 'isLoading' | 'options'> {
+	callback: FnReturningPromise
+	debounceMs?: number
+	withCache?: boolean
+}
 
 const SelectAsync = forwardRef<HTMLDivElement, Props>(({
+	callback,
+	debounceMs = 300,
 	onInputChange = noop,
 	onOpen = noop,
 	onClose = noop,
 	withCleanup = true,
+	withCache = true,
 	value: opt = { value: '', label: '' },
 	...props
 }, ref) => {
 
-	const [ debouncedCallback, cancel ] = useDebounce(fetchCities, 1000)
-	const [ { isPending, data: options }, execute, setState ] = useAsync(debouncedCallback, 'fetchCities')
+	const [ debouncedCallback, cancel ] = useDebounce(callback, debounceMs)
+	const [ { isPending, data: options }, execute, setState ] = useAsync(debouncedCallback, 'fetchCities', withCache)
 	const lastKeyword = useRef(opt.value)
 
 	const reset = () => {
@@ -32,9 +38,9 @@ const SelectAsync = forwardRef<HTMLDivElement, Props>(({
 
 	const handleInputChange = (keyword: string) => {
 		lastKeyword.current = keyword
-		if (keyword)
-			return execute(keyword)
-		reset()
+		keyword
+			? execute(keyword)
+			: reset()
 	}
 
 	const handleClose = () => {

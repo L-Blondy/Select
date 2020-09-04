@@ -13,7 +13,8 @@ type Execute<T extends FnReturningPromise> = (...args: Parameters<T>) => void
 
 const useAsync = function <T extends FnReturningPromise>(
 	callback: T,
-	nonRandomKey: string
+	nonRandomKey: string,
+	withCache: boolean = true
 ): [ State<T>, Execute<T>, SetState<State<T>> ] {
 
 	const callbackRef = useRef(callback)
@@ -31,8 +32,8 @@ const useAsync = function <T extends FnReturningPromise>(
 	const execute: Execute<T> = useCallback((...args) => {
 		const callID = ++lastCallID.current
 
-		const storedData = sessionStore.getItem(args)
-		if (storedData) {
+		const storedData = withCache && sessionStore.getItem(args)
+		if (withCache && storedData) {
 			setState({
 				data: storedData,
 				isPending: false,
@@ -54,7 +55,7 @@ const useAsync = function <T extends FnReturningPromise>(
 					isPending: false,
 					status: 'success',
 				})
-				sessionStore.setItem(args, data)
+				withCache && sessionStore.setItem(args, data)
 			})
 			.catch(error => {
 				if (!isMountedRef.current || callID !== lastCallID.current) return

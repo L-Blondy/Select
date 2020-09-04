@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
-import { BaseProps } from 'src/types'
+import { BaseProps, Opt } from 'src/types'
 import SelectBase from './base/SelectBase'
 
 const noop = () => { }
 
-interface Props extends Omit<BaseProps, 'isLoading' | 'withCleanup'> { }
+interface Props extends Omit<BaseProps, 'isLoading' | 'withCleanup'> {
+	filterFn: (option: Opt, keyword: string) => boolean
+}
 
 function SelectFiltered({
 	options: defaultOptions,
+	filterFn,
 	onInputChange = noop,
 	onClose = noop,
 	...props
@@ -15,9 +18,9 @@ function SelectFiltered({
 
 	const [ options, setOptions ] = useState(defaultOptions)
 
-	const handleInputChange = (filter: string) => {
-		onInputChange(filter)
-		setOptions(defaultOptions.filter(opt => RegExp('^' + filter, 'i').test(opt.label)))
+	const handleInputChange = (keyword: string) => {
+		onInputChange(keyword)
+		setOptions(defaultOptions.filter((option) => filterFn(option, keyword)))
 	}
 
 	const handleClose = () => {

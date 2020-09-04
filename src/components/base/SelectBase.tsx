@@ -1,7 +1,6 @@
 import React, { useReducer, useRef, forwardRef, useState, useCallback, useMemo } from 'react'
 import { reducer, Menu, Input, Loader, Arrow } from './'
 import { BaseProps, State, Actions, OpenSource } from 'src/types'
-import { useHover, useFocusWithin } from 'src/hooks'
 
 const noop = () => { }
 
@@ -34,7 +33,7 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 	const [ state, dispatch ] = useReducer<(state: State, action: Actions | Actions[]) => State>(reducer, {
 		index: 0,
 		isOpen: false,
-		filter: opt?.label || '',
+		keyword: opt?.label || '',
 		opt: opt ?? { value: '', label: '' },
 		isFocused: false
 	})
@@ -54,16 +53,16 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 	}), [ onMouseEnter, onMouseLeave ])
 
 	const handleInput = useMemo(() => ({
-		change(filter: string) {
+		change(keyword: string) {
 			if (!state.isOpen) {
 				dispatch({ type: 'open', source: OpenSource.inputChange, clear: withCleanup })
 				onOpen(OpenSource.inputChange)
 			}
 			dispatch([
 				{ type: 'set_index', index: 0 },
-				{ type: 'set_filter', filter }
+				{ type: 'set_keyword', keyword }
 			])
-			onInputChange(filter)
+			onInputChange(keyword)
 		},
 		pressUp() {
 			dispatch({ type: 'prev_index', options })
@@ -126,7 +125,7 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 
 	const getInputValue = () => {
 		if (state.isOpen || !withCleanup) {
-			return state.filter
+			return state.keyword
 		}
 		return opt?.label ?? state.opt.label
 	}

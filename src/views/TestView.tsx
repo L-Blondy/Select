@@ -2,14 +2,14 @@ import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { SelectAsync, SelectFiltered } from 'src/components'
 import { Opt } from 'src/types'
+import { fetchCities } from 'src/API'
 
 const noop = () => { }
 
 const TestView = () => {
 	const [ cleanup, setCleanup ] = useState<Opt>({ value: '', label: '' })
 	const [ noCleanup, setNoCleanup ] = useState<Opt>({ value: '', label: '' })
-	const [ sf, setSf ] = useState<Opt>({ value: '', label: '' })
-
+	const [ sf, setSf ] = useState<Opt>({ value: 'o', label: 'op' })
 
 	const options: Opt[] = [
 		{ value: 'opt1', label: 'opt1' },
@@ -26,15 +26,19 @@ const TestView = () => {
 
 			<h1>Async With cleanup</h1>
 			<SelectAsync
-				className='async-shit'
+				callback={fetchCities}
+				className='async-with-cleanup'
 				onChange={setCleanup}
 				value={cleanup}
+				withCache={false}
 			/>
 
 			<h1>Async Without cleanup</h1>
 			<SelectAsync
 				ref={ref}
-				className='async-shit'
+				debounceMs={300}
+				callback={fetchCities}
+				className='async-without-cleanup'
 				onChange={setNoCleanup}
 				value={noCleanup}
 				withCleanup={false}
@@ -42,6 +46,7 @@ const TestView = () => {
 
 			<h1>Filtered</h1>
 			<SelectFiltered
+				filterFn={(opt, keyword) => RegExp(keyword, 'i').test(opt.label)}
 				className='filtered'
 				options={options}
 				onFocus={(noop)}

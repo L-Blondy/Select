@@ -7,7 +7,7 @@ export type Opt = {
 export type State = {
 	index: number
 	isOpen: boolean,
-	filter: string,
+	keyword: string,
 	opt: Opt,
 	isFocused: boolean
 }
@@ -54,8 +54,8 @@ export type Actions =
 		opt: Opt
 	}
 	| {
-		type: 'set_filter',
-		filter: string
+		type: 'set_keyword',
+		keyword: string
 	}
 	| {
 		type: 'focus'
