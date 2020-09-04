@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
-import { SelectAsync, SelectFiltered } from 'src/components'
+import { SelectAsync, SelectFiltered, SelectAsyncFiltered } from 'src/components'
 import { Opt } from 'src/types'
-import { fetchCities } from 'src/API'
+import { fetch5Cities, fetchAllCities } from 'src/API'
 
 const noop = () => { }
 
 const TestView = () => {
-	const [ cleanup, setCleanup ] = useState<Opt>({ value: '', label: '' })
-	const [ noCleanup, setNoCleanup ] = useState<Opt>({ value: '', label: '' })
-	const [ sf, setSf ] = useState<Opt>({ value: 'o', label: 'op' })
+	const [ cleanup, setCleanup ] = useState<Opt>({ value: '_m', label: 'M' })
+	const [ noCleanup, setNoCleanup ] = useState<Opt>({ value: '_p', label: 'P' })
+	const [ sf, setSf ] = useState<Opt>({ value: '_g', label: 'G' })
 
 	const options: Opt[] = [
 		{ value: 'opt1', label: 'opt1' },
@@ -24,27 +24,27 @@ const TestView = () => {
 	return (
 		<Div$>
 
-			<h1>Async With cleanup</h1>
+			<h2>Async With cleanup</h2>
 			<SelectAsync
-				callback={fetchCities}
+				callback={fetch5Cities}
 				className='async-with-cleanup'
 				onChange={setCleanup}
 				value={cleanup}
 				withCache={false}
 			/>
 
-			<h1>Async Without cleanup</h1>
+			<h2>Async Without cleanup</h2>
 			<SelectAsync
 				ref={ref}
 				debounceMs={300}
-				callback={fetchCities}
+				callback={fetch5Cities}
 				className='async-without-cleanup'
 				onChange={setNoCleanup}
 				value={noCleanup}
 				withCleanup={false}
 			/>
 
-			<h1>Filtered</h1>
+			<h2>Filtered</h2>
 			<SelectFiltered
 				filterFn={(opt, keyword) => RegExp(keyword, 'i').test(opt.label)}
 				className='filtered'
@@ -61,6 +61,12 @@ const TestView = () => {
 				value={sf}
 			/>
 
+			<h2>Async Filtered With Cleanup</h2>
+			<SelectAsyncFiltered
+				callback={fetchAllCities}
+				filterFn={(opt, keyword) => RegExp(keyword, 'i').test(opt.label)}
+				withCleanup={false}
+			/>
 		</Div$>
 	)
 }

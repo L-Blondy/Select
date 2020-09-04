@@ -17,13 +17,13 @@ export type BaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange'
 	value?: Opt
 	noOptionsMessage?: string
 	onInputClick?: () => void
-	onInputChange?: (value: string) => void
-	onChange?: (value: Opt) => void
+	onInputChange?: (keyword: string) => void
+	onChange?: (option: Opt) => void
 	onOpen?: (openSource: OpenSource) => void
 	onClose?: () => void
 	onMouseEnter?: (e: React.MouseEvent<HTMLDivElement>) => void,
 	onMouseLeave?: (e: React.MouseEvent<HTMLDivElement>) => void,
-	isLoading?: boolean
+	isPending?: boolean
 	withCleanup?: boolean
 }
 

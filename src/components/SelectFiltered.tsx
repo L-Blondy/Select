@@ -4,7 +4,7 @@ import SelectBase from './base/SelectBase'
 
 const noop = () => { }
 
-interface Props extends Omit<BaseProps, 'isLoading' | 'withCleanup'> {
+interface Props extends Omit<BaseProps, 'isPending' | 'withCleanup'> {
 	filterFn: (option: Opt, keyword: string) => boolean
 }
 

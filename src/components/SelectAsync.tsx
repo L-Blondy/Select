@@ -5,7 +5,7 @@ import { BaseProps, Opt, OpenSource, FnReturningPromise } from 'src/types'
 
 const noop = () => { }
 
-interface Props extends Omit<BaseProps, 'isLoading' | 'options'> {
+interface Props extends Omit<BaseProps, 'isPending' | 'options'> {
 	callback: FnReturningPromise
 	debounceMs?: number
 	withCache?: boolean
@@ -19,13 +19,13 @@ const SelectAsync = forwardRef<HTMLDivElement, Props>(({
 	onClose = noop,
 	withCleanup = true,
 	withCache = true,
-	value: opt = { value: '', label: '' },
+	value: opt,
 	...props
 }, ref) => {
 
 	const [ debouncedCallback, cancel ] = useDebounce(callback, debounceMs)
 	const [ { isPending, data: options }, execute, setState ] = useAsync(debouncedCallback, 'fetchCities', withCache)
-	const lastKeyword = useRef(opt.value)
+	const lastKeyword = useRef(opt?.label || '')
 
 	const reset = () => {
 		cancel()
@@ -57,11 +57,12 @@ const SelectAsync = forwardRef<HTMLDivElement, Props>(({
 	return (
 		<SelectBase
 			options={options as Opt[] || []}
-			isLoading={isPending}
+			isPending={isPending}
 			onClose={handleClose}
 			onInputChange={handleInputChange}
 			onOpen={handleOpen}
 			withCleanup={withCleanup}
+			value={opt}
 			ref={ref}
 			{...props}
 		/>

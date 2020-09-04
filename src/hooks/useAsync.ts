@@ -3,11 +3,12 @@ import { useSetState, useMountedRef, useSessionStorage } from './'
 import { FnReturningPromiseReturnType, FnReturningPromise } from 'src/types';
 import { SetState } from 'src/hooks/useSetState'
 
-type State<T> = {
+type State<T extends FnReturningPromise> = {
 	isPending: boolean,
 	status: 'idle' | 'pending' | 'success' | 'error' | 'cancelled',
 	error: null | Error,
-	data: null | FnReturningPromiseReturnType<T>
+	data: null | FnReturningPromiseReturnType<T>,
+	args: null | Parameters<T>
 }
 type Execute<T extends FnReturningPromise> = (...args: Parameters<T>) => void
 
@@ -26,7 +27,8 @@ const useAsync = function <T extends FnReturningPromise>(
 		isPending: false,
 		status: 'idle',
 		error: null,
-		data: null
+		data: null,
+		args: null
 	})
 
 	const execute: Execute<T> = useCallback((...args) => {
@@ -34,15 +36,16 @@ const useAsync = function <T extends FnReturningPromise>(
 
 		const storedData = withCache && sessionStore.getItem(args)
 		if (withCache && storedData) {
-			setState({
+			return setState({
+				args,
 				data: storedData,
 				isPending: false,
 				status: 'success',
 			})
-			return
 		}
 
 		setState({
+			args,
 			isPending: true,
 			status: 'pending',
 		})
@@ -52,6 +55,7 @@ const useAsync = function <T extends FnReturningPromise>(
 				if (!isMountedRef.current || callID !== lastCallID.current) return
 				setState({
 					data,
+					args,
 					isPending: false,
 					status: 'success',
 				})
@@ -61,11 +65,12 @@ const useAsync = function <T extends FnReturningPromise>(
 				if (!isMountedRef.current || callID !== lastCallID.current) return
 				setState({
 					error,
+					args,
 					isPending: false,
 					status: 'error',
 				})
 			})
-	}, [ setState, isMountedRef, sessionStore ])
+	}, [ setState, isMountedRef, sessionStore, withCache ])
 
 	return [ state, execute, setState ]
 }

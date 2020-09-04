@@ -21,7 +21,7 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 	placeholder = 'Select...',
 	noOptionsMessage = 'No options',
 	options = [],
-	isLoading = false,
+	isPending = false,
 	value: opt,
 	className = '',
 	withCleanup = true,
@@ -160,7 +160,7 @@ const SelectBase = forwardRef<HTMLDivElement, BaseProps>(({
 
 			<Loader
 				data-testid='select__loader'
-				className={`select__loader ${isLoading ? '' : 'select__loader--hidden'} `}
+				className={`select__loader ${isPending ? '' : 'select__loader--hidden'} `}
 			/>
 
 			<div
